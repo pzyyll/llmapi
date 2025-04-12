@@ -1,16 +1,32 @@
 package middleware
 
 import (
+	"log/slog"
 	"time"
 
+	"llmapi/src/internal/constants"
+	"llmapi/src/internal/utils"
 	"llmapi/src/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GinLogger() gin.HandlerFunc {
+const requestIDHeader = "X-Request-ID"
+
+func RequestLogger() gin.HandlerFunc {
+	log := logger.WithType(logger.RequestType)
 	return func(c *gin.Context) {
 		start := time.Now()
+
+		// Generate or retrieve Request ID
+		requestID := c.Request.Header.Get(constants.HttpRequestIDHeader)
+		if requestID == "" {
+			requestID = utils.UUID()
+			c.Header(constants.HttpRequestIDHeader, requestID)
+		}
+
+		reqLogger := log.With(constants.HttpRequestIDKey, requestID)
+		c.Set(constants.ContextLoggerKey, reqLogger)
 
 		// Process request
 		c.Next()
@@ -22,16 +38,22 @@ func GinLogger() gin.HandlerFunc {
 		method := c.Request.Method
 		path := c.Request.URL.Path
 
-		logger.Log.Info(
+		reqLogger.Info(
 			"Request msg",
-			map[string]interface{}{
-				"status_code": statusCode,
-				"client_ip":   clientIP,
-				"method":      method,
-				"path":        path,
-				"duration":    duration,
-				"type":        "request",
-			},
+			"status_code", statusCode,
+			"client_ip", clientIP,
+			"method", method,
+			"path", path,
+			"duration", duration,
 		)
 	}
+}
+
+func GetContextLogger(c *gin.Context) *slog.Logger {
+	if logger, exists := c.Get(constants.ContextLoggerKey); exists {
+		if reqLogger, ok := logger.(*slog.Logger); ok {
+			return reqLogger
+		}
+	}
+	return logger.Sys()
 }

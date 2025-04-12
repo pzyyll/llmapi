@@ -12,3 +12,5 @@ Thumbs.db
 .nuxt
 dist
 node_modules
+.data
+.vscode

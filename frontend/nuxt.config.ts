@@ -1,22 +1,85 @@
 import path from 'path';
+import Icons from 'unplugin-icons/vite';
+import IconsResolver from 'unplugin-icons/resolver';
+import UnpluginViteComponents from 'unplugin-vue-components/vite';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	compatibilityDate: '2024-11-01',
 	devtools: { enabled: true },
 	ssr: false,
+	srcDir: 'src',
 	app: {
 		baseURL: '/dashboard'
 	},
+	css: ['~/assets/css/main.css'],
 	nitro: {
 		output: {
-			publicDir: path.resolve(__dirname, '../backend/src/static/dist')
+			publicDir: path.resolve(__dirname, '../backend/src/internal/router/dashboard/static/dist')
 		}
 	},
 	modules: [
-		'@nuxt/eslint'
-		// '@nuxt/icon',
-		// '@nuxt/fonts',
 		// '@nuxt/image'
-	]
+		'@nuxt/fonts',
+		'@nuxt/eslint',
+		'@pinia/nuxt',
+		'unplugin-icons/nuxt',
+		'reka-ui/nuxt',
+		'@nuxtjs/i18n',
+		'nuxt-auth-utils'
+	],
+	vite: {
+		plugins: [
+			tailwindcss(),
+			UnpluginViteComponents({
+				resolvers: [
+					IconsResolver({
+						prefix: '',
+						strict: true
+					})
+				]
+			}),
+			Icons({
+				autoInstall: true
+			})
+		]
+	},
+	i18n: {
+		locales: [
+			{
+				code: 'en',
+				name: 'English',
+				file: 'en.json'
+			},
+			{
+				code: 'zh',
+				name: '简体中文',
+				file: 'zh.json'
+			}
+		],
+		defaultLocale: 'zh',
+		restructureDir: 'src/i18n',
+		bundle: {
+			optimizeTranslationDirective: false
+		}
+		// strategies: {
+		// 	no_prefix: true,
+		// 	no_prefix_default_locale: false
+		// },
+		// detectBrowserLanguage: {
+		// 	useCookie: true,
+		// 	cookieCrossOrigin: false,
+		// 	fallbackLocale: 'en'
+		// }
+	},
+	runtimeConfig: {
+		public: {
+			apiBase: ''
+		}
+	},
+	devServer: {
+		port: 3003,
+		host: 'localhost'
+	}
 });

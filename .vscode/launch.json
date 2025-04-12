@@ -11,6 +11,18 @@
       "mode": "auto",
       "program": "${workspaceFolder}/backend/src/cmd/server/main.go",
       "cwd": "${workspaceFolder}/backend/",
+    },
+    {
+      "name": "Go: Dev Server",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/backend/src/cmd/server/main.go",
+      "cwd": "${workspaceFolder}/backend/",
+      "env": {
+        "DEV_FRONTEND_URL": "http://localhost:3003",
+        "LA_DSN": "postgres://postgres:postgres@localhost:15432/default"
+      }
     }
   ]
 }

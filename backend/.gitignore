@@ -10,5 +10,10 @@ Thumbs.db
 
 src/static/build/**
 src/static/dist/*
+backend/src/internal/router/dashboard/static/dist/*
 
+**/.jwt_secret.key
 **/__debug_bin*
+
+**/test.db
+**/llmapi.db

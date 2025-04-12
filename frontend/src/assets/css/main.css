@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+  themes: wireframe --default, dark --prefersdark;
+  /* root: ":root"; */
+  /* include: ; */
+  /* exclude: ; */
+  prefix: "d-";
+  logs: false;
+}

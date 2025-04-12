@@ -1,0 +1,56 @@
+name: llmapi
+
+services:
+  postgresql:
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      PGUSER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-default}
+      PGDATA: ${PGDATA:-/var/lib/postgresql/data/pgdata}
+    command: >
+      postgres -c 'max_connections=${POSTGRES_MAX_CONNECTIONS:-100}'
+               -c 'shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}'
+               -c 'work_mem=${POSTGRES_WORK_MEM:-4MB}'
+               -c 'maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}'
+               -c 'effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-4096MB}'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    ports:
+      - 127.0.0.1:15432:5432
+
+  redis:
+    image: "${REGISTRY:-docker.io}/redis:alpine"
+    # container_name: redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf
+    command: >
+      redis-server /etc/redis/redis.conf
+    ports:
+      - 127.0.0.1:16379:6379
+
+  mysql:
+    image: mysql:8.2
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: llmapi  # Ensure this matches the password in SQL_DSN
+      MYSQL_DATABASE: llmapi
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 127.0.0.1:13306:3306  # If you want to access MySQL from outside Docker, uncomment
+
+
+volumes:
+  postgres-data: {}
+  redis-data: {}
+  mysql_data: {}
