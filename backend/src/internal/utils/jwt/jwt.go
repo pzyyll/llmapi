@@ -26,7 +26,9 @@ func NewLoginPayload(userID uint, username string, issuer string, expire uint, j
 	}
 }
 
-func GenerateToken(secretKey string, payload *LoginPayloayd) (string, error) {
+// GenerateToken creates a signed JWT string using the provided secret key and payload.
+// It uses HS256 as the signing method.
+func GenerateToken(secretKey string, payload *LoginPayload) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	return token.SignedString([]byte(secretKey))
 }
