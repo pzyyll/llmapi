@@ -6,18 +6,23 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type LoginPayloayd struct {
+// LoginPayload defines the structure of the JWT claims for user login.
+type LoginPayload struct { // Renamed LoginPayloayd to LoginPayload
 	UserID   uint   `json:"user_id"`
 	Username string `json:"username"`
-	Jti      int    `json:"jti,omitempty"`
+	// jti (JWT ID) claim provides a unique identifier for the JWT.
+	// Can be used to prevent JWT replays (once per token).
+	// Also useful for correlating refresh tokens or enabling token revocation.
+	jti int `json:"jti,omitempty"` // Renamed field Jti to jti
 	jwt.RegisteredClaims
 }
 
-func NewLoginPayload(userID uint, username string, issuer string, expire uint, jti int) *LoginPayloayd {
-	return &LoginPayloayd{
+// NewLoginPayload creates a new instance of LoginPayload with standard and custom claims.
+func NewLoginPayload(userID uint, username string, issuer string, expire uint, jti int) *LoginPayload { // Updated return type
+	return &LoginPayload{ // Updated struct literal type
 		UserID:   userID,
 		Username: username,
-		Jti:      jti,
+		jti:      jti, // Updated field name
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    issuer,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
