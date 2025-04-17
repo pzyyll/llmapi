@@ -7,40 +7,48 @@ import (
 	"os"
 	"strings"
 
+	"llmapi/src/internal/constants"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/v2"
 )
 
-const (
-	secretFilePath   = ".jwt_secret.key"
-	desiredKeyLength = 64
-	env_prefix       = "LA_"
-)
-
 type Config struct {
-	Port       int    `koanf:"port" validate:"min=1,max=65535"`
-	Host       string `koanf:"host" validate:"hostname|ip"`
-	DSN        string `koanf:"dsn"`
-	RedisURL   string `koanf:"redis_url"`
-	JwtSecret  string `koanf:"jwt_secret"`
-	JwtExpiry  int    `koanf:"jwt_expiry" validate:"min=3600"`
-	JwtIssuer  string `koanf:"jwt_issuer"`
-	LogLevel   string `koanf:"log_level" validate:"oneof=debug info warn error"`
-	DBLogLevel int    `koanf:"db_log_level" validate:"min=1,max=4"` // 1: Silent, 2: Error, 3: Warn, 4: Info
+	Port               int    `koanf:"port" validate:"min=1,max=65535"`
+	Host               string `koanf:"host" validate:"hostname|ip"`
+	DSN                string `koanf:"dsn"`
+	RedisURL           string `koanf:"redis_url"`
+	AccessTokenExpiry  int    `koanf:"access_token_expiry" validate:"min=1"`
+	RefreshTokenExpiry int    `koanf:"refresh_token_expiry" validate:"min=1"`
+	JwtSecret          string `koanf:"jwt_secret"`
+	JwtIssuer          string `koanf:"jwt_issuer"`
+	JwtSignedMethod    string `koanf:"jwt_signed_method" validate:"oneof=HS256 HS384 HS512"`
+	LogLevel           string `koanf:"log_level" validate:"oneof=debug info warn error"`
+	DBLogLevel         int    `koanf:"db_log_level" validate:"min=1,max=4"` // 1: Silent, 2: Error, 3: Warn, 4: Info
+	DBAutoMigrate      bool   `koanf:"db_auto_migrate"`
+	WorkerID           int64  `koanf:"worker_id"` // Unique identifier for the worker, used in distributed systems
+	AdminUser          string `koanf:"admin_user"`
+	AdminPassword      string `koanf:"admin_password"`
 }
 
 func initDefaultConfig() *Config {
 	return &Config{
-		Port:       13140,
-		Host:       "localhost",
-		DSN:        "sqlite://llmapi.db",
-		RedisURL:   "",
-		JwtSecret:  "",
-		JwtExpiry:  30 * 24 * 60 * 60, // 30 days in seconds
-		JwtIssuer:  "llmapi",
-		LogLevel:   "info",
-		DBLogLevel: 1,
+		Port:               13140,
+		Host:               "localhost",
+		DSN:                "sqlite://llmapi.db",
+		RedisURL:           "",
+		JwtSecret:          "",
+		AccessTokenExpiry:  3600,              // 1 hour in seconds
+		RefreshTokenExpiry: 30 * 24 * 60 * 60, // 30 days
+		JwtIssuer:          "llmapi",
+		JwtSignedMethod:    "HS256",
+		LogLevel:           "info",
+		DBLogLevel:         1,
+		DBAutoMigrate:      true,
+		WorkerID:           1,
+		AdminUser:          "admin",
+		AdminPassword:      "zaq12wsx@0",
 	}
 }
 
@@ -63,9 +71,9 @@ func LoadConfig() *Config {
 
 func loadFromEnvironment(c *Config) {
 	k := koanf.New("_")
-	err := k.Load(env.Provider(env_prefix, "_", func(key string) string {
+	err := k.Load(env.Provider(constants.EnvPrefix, "_", func(key string) string {
 		return strings.ToLower(
-			strings.TrimPrefix(key, env_prefix),
+			strings.TrimPrefix(key, constants.EnvPrefix),
 		)
 	}), nil)
 	if err != nil {
@@ -79,17 +87,19 @@ func ensureJwtSecret(c *Config) {
 		return
 	}
 
-	data, err := os.ReadFile(secretFilePath)
+	data, err := os.ReadFile(constants.SecretFilePath)
 	if err == nil {
 		c.JwtSecret = string(data)
 		return
 	}
 
-	c.JwtSecret = generateRandomSecret(desiredKeyLength)
-	err = os.WriteFile(secretFilePath, []byte(c.JwtSecret), 0o644)
+	c.JwtSecret = generateRandomSecret(constants.DesiredKeyLength)
+	err = os.WriteFile(constants.SecretFilePath, []byte(c.JwtSecret), 0o644)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("JWT secret written to:", constants.SecretFilePath)
 }
 
 func validateConfig(c *Config) error {

@@ -16,7 +16,6 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, "", config.RedisURL)
 	// Check if the JWT secret is generated and not ""
 	assert.NotEqual(t, "", config.JwtSecret)
-	assert.Equal(t, 30*24*60*60, config.JwtExpiry) // 30 days in seconds
 	assert.Equal(t, "llmapi", config.JwtIssuer)
 	assert.Equal(t, "info", config.LogLevel)
 	// Add more tests for other fields as needed
@@ -40,7 +39,6 @@ func TestLoadEnv(t *testing.T) {
 	assert.Equal(t, "postgres://user:password@localhost:5432/dbname", config.DSN)
 	assert.Equal(t, "redis://localhost:6379", config.RedisURL)
 	assert.Equal(t, "mysecret", config.JwtSecret)
-	assert.Equal(t, 3600, config.JwtExpiry)
 	assert.Equal(t, "myissuer", config.JwtIssuer)
 	assert.Equal(t, "debug", config.LogLevel)
 }

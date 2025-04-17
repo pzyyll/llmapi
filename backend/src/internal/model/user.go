@@ -6,9 +6,14 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string  `gorm:"unique;not null"`
+	UserID   int64   `gorm:"indexUnique;not null"`
+	Username string  `gorm:"indexUnique;not null"`
 	Password string  `gorm:"not null"`
-	Email    *string `gorm:"unique"`
+	Email    *string `gorm:"indexUnique"`
+	IsActive bool    `gorm:"not null;default:true"`
+	Role     string  `gorm:"not null;default:'user';index"` // user, admin, superadmin
 }
 
-
+func (User) TableName() string {
+	return "users"
+}

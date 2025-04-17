@@ -9,7 +9,9 @@ import (
 
 	"llmapi/src/internal/config"
 	"llmapi/src/internal/middleware"
+	"llmapi/src/internal/repository"
 	internalRouter "llmapi/src/internal/router"
+	"llmapi/src/internal/utils/log"
 	"llmapi/src/pkg/logger"
 )
 
@@ -33,13 +35,23 @@ func InitServer() error {
 	cfg = config.LoadConfig()
 	logger.SetLevelString(cfg.LogLevel)
 
+	// Initialize database connection
+	db, err := repository.InitDB(cfg)
+	if err != nil {
+		return err
+	}
+
 	router = gin.New()
 
 	// Set middleware for the engine
 	router.Use(middleware.RequestLogger())
 	router.Use(gin.Recovery())
 
-	internalRouter.SetupRouter(router)
+	internalRouter.SetupRouter(&internalRouter.Options{
+		Engine: router,
+		DB:     db,
+		Cfg:    cfg,
+	})
 
 	return nil
 }
@@ -49,9 +61,9 @@ func Run() {
 		panic("router is not initialized")
 	}
 	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	logger.Sys().Info("Starting server...", "host", address)
+	log.Sys().Info("Starting server...", "host", address)
 	if err := router.Run(address); err != nil {
-		logger.Sys().Error("Failed to start server", "error", err)
+		log.Sys().Error("Failed to start server", "error", err)
 	}
-	logger.Sys().Info("Exit...")
+	log.Sys().Info("Exit...")
 }

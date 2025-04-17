@@ -9,9 +9,9 @@ type GormLogger struct {
 	logger *slog.Logger
 }
 
-func NewGormLogger() *GormLogger {
+func NewGormLogger(logger *slog.Logger) *GormLogger {
 	return &GormLogger{
-		logger: slog.With(slog.String(Type, GromType)),
+		logger: logger,
 	}
 }
 

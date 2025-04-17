@@ -6,7 +6,7 @@ import (
 
 	"llmapi/src/internal/constants"
 	"llmapi/src/internal/utils"
-	"llmapi/src/pkg/logger"
+	"llmapi/src/internal/utils/log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,7 @@ import (
 const requestIDHeader = "X-Request-ID"
 
 func RequestLogger() gin.HandlerFunc {
-	log := logger.WithType(logger.RequestType)
+	log := log.WithType(log.RequestType)
 	return func(c *gin.Context) {
 		start := time.Now()
 
@@ -55,5 +55,5 @@ func GetContextLogger(c *gin.Context) *slog.Logger {
 			return reqLogger
 		}
 	}
-	return logger.Sys()
+	return log.Sys()
 }

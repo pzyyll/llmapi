@@ -5,7 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"llmapi/src/internal/config"
 	"llmapi/src/internal/constants"
+	"llmapi/src/internal/utils/log"
 	"llmapi/src/pkg/logger"
 
 	"gorm.io/driver/mysql"
@@ -17,12 +19,10 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-
 type Options struct {
-	DSN       string // Data Source Name for the database connection
+	DSN        string // Data Source Name for the database connection
 	DBLogLevel int    // Log level for GORM logger
 }
-
 
 func CreateDB(opts *Options) (*gorm.DB, error) {
 	// get db type from dsn prefix find first "://"
@@ -34,7 +34,7 @@ func CreateDB(opts *Options) (*gorm.DB, error) {
 		return nil, fmt.Errorf("invalid DSN format: missing '://' scheme prefix in %s", dsn)
 	}
 
-	log := logger.Sys().With("dsn", dsn)
+	logWithDsn := log.Sys().With("dsn", dsn)
 
 	dbType := strings.ToLower(dsn[:idx]) // Ensure lowercase comparison
 	var dialector gorm.Dialector
@@ -45,15 +45,15 @@ func CreateDB(opts *Options) (*gorm.DB, error) {
 			return nil, fmt.Errorf("invalid SQLite DSN: missing path after sqlite://")
 		}
 		dialector = sqlite.Open(connStr)
-		log.Info("Initializing SQLite database")
+		logWithDsn.Info("Initializing SQLite database")
 	case constants.PostgresType, constants.PostgresType + "ql":
 		dialector = postgres.New(postgres.Config{
 			DSN:                  dsn,
 			PreferSimpleProtocol: true, // disables implicit prepared statement usage
 		})
-		log.Info("Initializing PostgreSQL database from DSN")
+		logWithDsn.Info("Initializing PostgreSQL database from DSN")
 	case constants.MysqlType:
-		connStr := dsn[idx+3:]	
+		connStr := dsn[idx+3:]
 		if connStr == "" {
 			return nil, fmt.Errorf("invalid MySQL DSN: missing connection string after mysql://")
 		}
@@ -65,21 +65,21 @@ func CreateDB(opts *Options) (*gorm.DB, error) {
 			DontSupportRenameColumn:   true,
 			SkipInitializeWithVersion: false,
 		})
-		log.Info("Initializing MySQL database from DSN")
+		logWithDsn.Info("Initializing MySQL database from DSN")
 	case constants.SqlServerType:
 		dialector = sqlserver.Open(dsn)
-		log.Info("Initializing SQL Server database from DSN")
+		logWithDsn.Info("Initializing SQL Server database from DSN")
 	default:
 		return nil, fmt.Errorf("unsupported database type: %s", dbType)
 	}
 
 	dbLog := gormlog.New(
-		logger.NewGormLogger(),
+		logger.NewGormLogger(log.WithType(log.GormType)),
 		gormlog.Config{
-			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                 gormlog.LogLevel(opts.DBLogLevel), // Log level
-			IgnoreRecordNotFoundError: true, // Ignore ErrRecordNotFound error for logger
-			Colorful:                 true, // Disable colorful log
+			SlowThreshold:             time.Second,                       // Slow SQL threshold
+			LogLevel:                  gormlog.LogLevel(opts.DBLogLevel), // Log level
+			IgnoreRecordNotFoundError: true,                              // Ignore ErrRecordNotFound error for logger
+			Colorful:                  true,                              // Disable colorful log
 		},
 	)
 
@@ -104,12 +104,35 @@ func CreateDB(opts *Options) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(time.Hour)        // Max lifetime of a connection
 	sqlDB.SetConnMaxIdleTime(time.Minute * 15) // Max idle time for a connection
 
-	logger.Sys().Info("Pinging database to verify connection...")
+	logWithDsn.Info("Pinging database to verify connection...")
 	err = sqlDB.Ping()
 	if err != nil {
 		sqlDB.Close()
 		return nil, fmt.Errorf("failed to ping %s database after connection: %w", dbType, err)
 	}
-	logger.Sys().Info("Successfully connected to database.", "database_type", dbType)
+	logWithDsn.Info("Successfully connected to database.", "database_type", dbType)
+	return db, nil
+}
+
+func InitDB(cfg *config.Config) (*gorm.DB, error) {
+	log := log.Sys().With("dsn", cfg.DSN)
+	log.Info("Initializing database connection...")
+
+	db, err := CreateDB(&Options{
+		DSN:        cfg.DSN,
+		DBLogLevel: cfg.DBLogLevel,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create database: %w", err)
+	}
+
+	// Auto-migrate database schema if enabled
+	if cfg.DBAutoMigrate {
+		log.Info("Auto-migrating database schema...")
+		if err := AutoMigrate(db); err != nil {
+			return nil, fmt.Errorf("failed to auto-migrate database: %w", err)
+		}
+		log.Info("Database auto-migration completed")
+	}
 	return db, nil
 }

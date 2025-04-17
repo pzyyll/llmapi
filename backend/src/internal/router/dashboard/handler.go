@@ -6,37 +6,49 @@ import (
 	"net/url"
 	"os"
 
+	"llmapi/src/internal/constants"
 	"llmapi/src/internal/middleware"
 	"llmapi/src/internal/router/dashboard/api"
-	"llmapi/src/pkg/logger"
+	"llmapi/src/internal/service"
+	"llmapi/src/internal/utils/log"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
-const BasePrefix = "/dashboard"
-
 //go:embed all:static
 var StaticDistFS embed.FS
 
+type Options struct {
+	Engine  *gin.Engine
+	UserSvc service.UserService
+	AuthSvc service.AuthService
+}
+
 // SetupRouter configures all dashboard routes including API and web UI
-func SetupRouter(engine *gin.Engine) {
+func SetupRouter(opts *Options) {
+	engine := opts.Engine
+
 	// Configure CORS middleware
 	engine.Use(middleware.CORS())
 
 	// Setup API routes
-	setupAPIRoutes(engine)
+	setupAPIRoutes(opts)
 
 	// Setup frontend routes - either dev redirect or static files
-	setupFrontendRoutes(engine)
+	setupFrontendRoutes(opts)
 }
 
 // setupAPIRoutes configures all dashboard API endpoints
-func setupAPIRoutes(engine *gin.Engine) {
-	apiGroup := engine.Group(BasePrefix+"/api", gzip.Gzip(gzip.DefaultCompression))
+func setupAPIRoutes(opts *Options) {
+	engine := opts.Engine
+
+	
+	apiGroup := engine.Group(constants.DashboardPrefix+"/api", gzip.Gzip(gzip.DefaultCompression))
 	{
-		apiGroup.POST("/login", api.Login)
+		authHandler := api.NewAuthHander(opts.UserSvc, opts.AuthSvc)
+		apiGroup.POST("/login", authHandler.Login)
 		// Additional API routes can be added here
 	}
 }
@@ -44,7 +56,8 @@ func setupAPIRoutes(engine *gin.Engine) {
 // setupFrontendRoutes configures the dashboard UI routes
 // If DEV_FRONTEND_URL is set, it redirects to that URL
 // Otherwise, it serves embedded static files
-func setupFrontendRoutes(engine *gin.Engine) {
+func setupFrontendRoutes(opts *Options) {
+	engine := opts.Engine
 	devFrontendUrl := os.Getenv("DEV_FRONTEND_URL")
 	if devFrontendUrl != "" {
 		setupDevRedirect(engine, devFrontendUrl)
@@ -57,11 +70,11 @@ func setupFrontendRoutes(engine *gin.Engine) {
 func setupDevRedirect(engine *gin.Engine, devFrontendUrl string) {
 	baseUrl, err := url.Parse(devFrontendUrl)
 	if err != nil {
-		logger.Sys().Error("The frontend url at `DEV_FRONTEND_URL` is invalid.", "url", devFrontendUrl)
+		log.Sys().Error("The frontend url at `DEV_FRONTEND_URL` is invalid.", "url", devFrontendUrl)
 		return
 	}
 
-	engine.GET(BasePrefix, func(c *gin.Context) {
+	engine.GET(constants.DashboardPrefix, func(c *gin.Context) {
 		targetUrl := baseUrl.JoinPath(c.Request.URL.Path)
 		c.Redirect(http.StatusMovedPermanently, targetUrl.String())
 	})
@@ -71,7 +84,7 @@ func setupDevRedirect(engine *gin.Engine, devFrontendUrl string) {
 func serveStaticFiles(engine *gin.Engine) {
 	fs, err := static.EmbedFolder(StaticDistFS, "static/dist")
 	if err != nil {
-		logger.Sys().Error("Failed to create embed folder.", "error", err.Error())
+		log.Sys().Error("Failed to create embed folder.", "error", err.Error())
 		return
 	}
 
@@ -83,7 +96,7 @@ func serveStaticFiles(engine *gin.Engine) {
 	// engine.Use(middleware.Cache())
 
 	// Serve static files
-	engine.Use(static.Serve(BasePrefix, fs))
+	engine.Use(static.Serve(constants.DashboardPrefix, fs))
 
 	// Configure SPA routing - always return index.html for unmatched routes
 	setupSPARouting(engine)
@@ -93,7 +106,7 @@ func serveStaticFiles(engine *gin.Engine) {
 func setupSPARouting(engine *gin.Engine) {
 	indexHtml, err := StaticDistFS.ReadFile("static/dist/index.html")
 	if err != nil {
-		logger.Sys().Error("Failed to read index.html.", "error", err.Error())
+		log.Sys().Error("Failed to read index.html.", "error", err.Error())
 		return
 	}
 

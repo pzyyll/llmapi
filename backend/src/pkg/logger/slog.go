@@ -3,20 +3,9 @@ package logger
 import (
 	"log/slog"
 	"os"
-	"sync"
 )
 
-const (
-	Type     = "msg_type"
-	SysType  = "sys"
-	GromType = "gorm"
-	RequestType = "request"
-)
-
-var (
-	logLevel        = new(slog.LevelVar)
-	typeLoggerCache sync.Map
-)
+var logLevel = new(slog.LevelVar)
 
 func InitDefaultLogger() *slog.Logger {
 	logLevel.Set(slog.LevelInfo)
@@ -48,19 +37,6 @@ func SetLevelString(lv string) error {
 
 func SetLevel(level slog.Level) {
 	logLevel.Set(level)
-}
-
-func WithType(typ string) *slog.Logger {
-	if loggerVal, ok := typeLoggerCache.Load(typ); ok {
-		return loggerVal.(*slog.Logger)
-	}
-	logger := slog.With(slog.String(Type, typ))
-	typeLoggerCache.Store(typ, logger)
-	return logger
-}
-
-func Sys() *slog.Logger {
-	return WithType(SysType)
 }
 
 func Get() *slog.Logger {
