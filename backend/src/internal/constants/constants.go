@@ -49,3 +49,8 @@ const (
 	JWT_SIGNED_HS384 = "HS384"
 	JWT_SIGNED_HS512 = "HS512"
 )
+
+const (
+	AuthTypeBasic  = "basic"
+	AuthTypeBearer = "bearer"
+)

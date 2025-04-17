@@ -51,14 +51,13 @@ func (r *AuthHandler) Login(c *gin.Context) {
 
 func (r *AuthHandler) RefreshToken(c *gin.Context) {
 	// Get Authorization header in "Bearer <token>" format
-	authorization := c.GetHeader("Authorization")
-	if authorization == "" {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Code:    http.StatusUnauthorized,
-			Message: "Authorization header not found",
-		})
-		return
-	}
+	// authorization := c.GetHeader("Authorization")
+	// if authorization == "" {
+	// 	c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
+	// 		Code:    http.StatusUnauthorized,
+	// 		Message: "Authorization header not found",
+	// 	})
+	// 	return
+	// }
 	// Parse header info "Bearer" and "<token>"  AI!
-	
 }

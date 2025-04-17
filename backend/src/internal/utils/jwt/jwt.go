@@ -46,3 +46,19 @@ func GenerateToken(signedMethod string, secretKey string, payload *LoginPayload)
 	token := jwt.NewWithClaims(method, payload)
 	return token.SignedString([]byte(secretKey))
 }
+
+func ParseToken(tokenString string, secretKey string) (*LoginPayload, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &LoginPayload{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secretKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(*LoginPayload); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, fmt.Errorf("invalid token")
+}

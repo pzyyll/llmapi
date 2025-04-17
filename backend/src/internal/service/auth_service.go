@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"llmapi/src/internal/config"
@@ -84,8 +85,15 @@ func (s *authService) VerifyUser(ctx context.Context, username string, password 
 	}, nil
 }
 
+func (s *authService) VerifyAccessToken(token string) (user *model.User, err error) {
+	// Parse the access token
+
+	return nil, fmt.Errorf("not implemented")
+}
+
 func (s *authService) VerifyRefreshToken(ctx context.Context) (ret *Result, err error) {
 	// Parse the refresh token
 	// authHeader := ctx.GetHeader("Authorization")
-	return nil, nil
+
+	return nil, fmt.Errorf("not implemented")
 }
