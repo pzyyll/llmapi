@@ -15,6 +15,8 @@ const (
 
 const (
 	ContextLoggerKey = "logger"
+	ContextUserKey   = "user"
+	ContextRefreshTokenPayloadKey = "refresh_token_payload"
 )
 
 const (

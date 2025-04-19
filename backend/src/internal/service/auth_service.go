@@ -21,7 +21,8 @@ type Result struct {
 
 type AuthService interface {
 	VerifyUser(ctx context.Context, username string, password string) (ret *Result, err error)
-	VerifyRefreshToken(ctx context.Context) (ret *Result, err error)
+	VerifyRefreshToken(token string) (user *model.User, err error)
+	VerifyAccessToken(token string) (user *model.User, err error)
 }
 
 type authService struct {
@@ -87,11 +88,15 @@ func (s *authService) VerifyUser(ctx context.Context, username string, password 
 
 func (s *authService) VerifyAccessToken(token string) (user *model.User, err error) {
 	// Parse the access token
+	claims, err := jwt.ParseToken(token, s.cfg.JwtSecret)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, fmt.Errorf("not implemented")
+	return s.userService.GetUserByID(int64(claims.UserID))
 }
 
-func (s *authService) VerifyRefreshToken(ctx context.Context) (ret *Result, err error) {
+func (s *authService) VerifyRefreshToken(token string) (user *model.User, err error) {
 	// Parse the refresh token
 	// authHeader := ctx.GetHeader("Authorization")
 

@@ -44,12 +44,22 @@ func SetupRouter(opts *Options) {
 func setupAPIRoutes(opts *Options) {
 	engine := opts.Engine
 
-	
 	apiGroup := engine.Group(constants.DashboardPrefix+"/api", gzip.Gzip(gzip.DefaultCompression))
 	{
 		authHandler := api.NewAuthHander(opts.UserSvc, opts.AuthSvc)
 		apiGroup.POST("/login", authHandler.Login)
 		// Additional API routes can be added here
+
+		authMiddleware := middleware.NewAuthMiddleware(opts.AuthSvc)
+		authenticatedGroup := apiGroup.Group("") // 创建子分组
+		authenticatedGroup.Use(authMiddleware.AuthAccessTokenMiddleware())
+		{
+			userHandler := api.NewUserHandler(opts.UserSvc)
+			authenticatedGroup.POST("/profile", userHandler.GetUserInfo)
+			authenticatedGroup.POST("/update_profile", userHandler.UpdateUserInfo)
+		}
+
+		apiGroup.POST("/renew_token", authMiddleware.RefreshTokenMiddleware(), authHandler.RefreshToken)
 	}
 }
 

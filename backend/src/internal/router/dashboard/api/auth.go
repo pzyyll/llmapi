@@ -60,4 +60,5 @@ func (r *AuthHandler) RefreshToken(c *gin.Context) {
 	// 	return
 	// }
 	// Parse header info "Bearer" and "<token>"  AI!
+	// TODO: use auth package to parse
 }
