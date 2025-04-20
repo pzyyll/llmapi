@@ -6,6 +6,7 @@ import (
 	"llmapi/src/internal/constants"
 	"llmapi/src/internal/dto"
 	"llmapi/src/internal/model"
+	apiDto "llmapi/src/internal/router/dashboard/api/dto"
 	"llmapi/src/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +40,18 @@ func (h *UserHandler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, userInfo)
+	email := ""
+	if userInfo.Email != nil {
+		email = *userInfo.Email
+	}
+
+	c.JSON(http.StatusOK, apiDto.UserProfile{
+		UserID:   uint(userInfo.UserID),
+		Username: userInfo.Username,
+		Email:    email,
+		Role:     userInfo.Role,
+		IsActive: userInfo.IsActive,
+	})
 }
 
 // UpdateUserInfo handles the request to update user information

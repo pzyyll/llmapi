@@ -48,11 +48,12 @@ func setupAPIRoutes(opts *Options) {
 	{
 		authHandler := api.NewAuthHander(opts.UserSvc, opts.AuthSvc)
 		apiGroup.POST("/login", authHandler.Login)
+		apiGroup.POST("/register", authHandler.Register)
 		// Additional API routes can be added here
 
 		authMiddleware := middleware.NewAuthMiddleware(opts.AuthSvc)
 		authenticatedGroup := apiGroup.Group("") // 创建子分组
-		authenticatedGroup.Use(authMiddleware.AuthAccessTokenMiddleware())
+		authenticatedGroup.Use(authMiddleware.AccessTokenMiddleware())
 		{
 			userHandler := api.NewUserHandler(opts.UserSvc)
 			authenticatedGroup.POST("/profile", userHandler.GetUserInfo)

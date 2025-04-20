@@ -23,7 +23,7 @@ func NewAuthMiddleware(authService service.AuthService) *AuthMiddleware {
 }
 
 // AuthMiddleware is a middleware that checks if the user is authenticated
-func (a *AuthMiddleware) AuthAccessTokenMiddleware() gin.HandlerFunc {
+func (a *AuthMiddleware) AccessTokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the user is authenticated
 		protocol, token, err := auth.GetAuthorizationToken(c.GetHeader("Authorization"))
@@ -94,7 +94,7 @@ func (a *AuthMiddleware) RefreshTokenMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set(constants.ContextUserKey, user)
-		c.Set(constants.ContextRefreshTokenPayloadKey, token)
+		c.Set(constants.ContextRefreshTokenKey, token)
 
 		c.Next()
 	}

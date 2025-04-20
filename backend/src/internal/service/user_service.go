@@ -3,21 +3,21 @@ package service
 import (
 	"fmt"
 	"regexp"
-	"time"
 
 	"llmapi/src/internal/config"
 	"llmapi/src/internal/constants"
 	"llmapi/src/internal/model"
 	"llmapi/src/internal/repository"
 	"llmapi/src/internal/utils"
-	"llmapi/src/pkg/auth"
+	"llmapi/src/internal/utils/log"
 
 	"gorm.io/gorm"
 )
 
 type UserService interface {
-	CreateUser(username, password string) (*model.User, error)
+	CreateUser(username, password string, role constants.RoleType) (*model.User, error)
 	GetUserByID(id int64) (*model.User, error)
+	GetUserByUserID(userID int64) (*model.User, error)
 	GetUserByName(username string) (*model.User, error)
 	DeleteUser(id int64) error
 	InitAdminUser() error
@@ -37,7 +37,7 @@ func NewUserService(userRepo repository.UserRepo, cfg *config.Config, uidGenerat
 	}
 }
 
-func (s *userService) CreateUser(username, password string) (*model.User, error) {
+func (s *userService) CreateUser(username, password string, role constants.RoleType) (*model.User, error) {
 	if _, err := s.userRepo.GetUserByName(username); err == nil {
 		return nil, fmt.Errorf("user already exists")
 	}
@@ -54,23 +54,32 @@ func (s *userService) CreateUser(username, password string) (*model.User, error)
 		return nil, fmt.Errorf("username can only contain alphanumeric characters and underscores")
 	}
 
+	if role == "" {
+		role = constants.RoleTypeUser
+	}
+
 	user := &model.User{
 		UserID:   s.uidGenerator.GenerateUID(),
 		Username: username,
 		Password: password,
 		IsActive: true,
-		Role:     constants.RoleTypeUser,
+		Role:     string(role),
 	}
 
 	if err := s.userRepo.CreateUser(user); err != nil {
 		return nil, err
 	}
 
+	log.Sys().Info("User created", "username", username, "role", role)
 	return user, nil
 }
 
 func (s *userService) GetUserByID(id int64) (*model.User, error) {
 	return s.userRepo.GetUserByID(id)
+}
+
+func (s *userService) GetUserByUserID(userID int64) (*model.User, error) {
+	return s.userRepo.GetUserByUserID(userID)
 }
 
 func (s *userService) GetUserByName(username string) (*model.User, error) {
@@ -91,25 +100,9 @@ func (s *userService) InitAdminUser() error {
 		return fmt.Errorf("failed to check if admin user exists: %w", err)
 	}
 
-	hashedPassword, err := auth.HashPassword(s.cfg.AdminPassword)
+	_, err = s.CreateUser(s.cfg.AdminUser, s.cfg.AdminPassword, constants.RoleTypeSuper)
 	if err != nil {
-		return fmt.Errorf("failed to hash admin password: %w", err)
-	}
-
-	adminUser := &model.User{
-		Model: gorm.Model{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			ID:        uint(s.uidGenerator.GenerateUID()),
-		},
-		Username: s.cfg.AdminUser,
-		Password: hashedPassword,
-		IsActive: true,
-		Role:     constants.RoleTypeSuper,
-	}
-
-	if err := s.userRepo.CreateUser(adminUser); err != nil {
-		return err
+		return fmt.Errorf("failed to create admin user: %w", err)
 	}
 
 	return nil

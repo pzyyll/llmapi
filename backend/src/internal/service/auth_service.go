@@ -10,6 +10,7 @@ import (
 	"llmapi/src/internal/model"
 	"llmapi/src/internal/utils"
 	"llmapi/src/internal/utils/jwt"
+	"llmapi/src/internal/utils/log"
 	"llmapi/src/pkg/auth"
 )
 
@@ -23,6 +24,9 @@ type AuthService interface {
 	VerifyUser(ctx context.Context, username string, password string) (ret *Result, err error)
 	VerifyRefreshToken(token string) (user *model.User, err error)
 	VerifyAccessToken(token string) (user *model.User, err error)
+
+	CreateToken(user *model.User) (access_token, refresh_token string, err error)
+	DeleteRefreshToken(token string) error
 }
 
 type authService struct {
@@ -40,16 +44,7 @@ func NewAuthService(userService UserService, cfg *config.Config, uidGenrator uti
 	}
 }
 
-func (s *authService) VerifyUser(ctx context.Context, username string, password string) (ret *Result, err error) {
-	user, err := s.userService.GetUserByName(username)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := auth.CheckPasswordHash(password, user.Password); err != nil {
-		return nil, err
-	}
-
+func (s *authService) CreateToken(user *model.User) (access_token, refresh_token string, err error) {
 	// Generate access token
 	payload := jwt.NewLoginPayload(
 		user.ID,
@@ -60,7 +55,7 @@ func (s *authService) VerifyUser(ctx context.Context, username string, password 
 	)
 	token, err := jwt.GenerateToken(s.cfg.JwtSignedMethod, s.cfg.JwtSecret, payload)
 	if err != nil {
-		return nil, err
+		return "", "", err
 	}
 
 	tokenid := s.uidGenerator.GenerateUID()
@@ -73,11 +68,50 @@ func (s *authService) VerifyUser(ctx context.Context, username string, password 
 	)
 	refreshToken, err := jwt.GenerateToken(s.cfg.JwtSignedMethod, s.cfg.JwtSecret, rPayload)
 	if err != nil {
-		return nil, err
+		return "", "", err
 	}
 	// Store the refresh token
-	refreshTokenMap, _ := s.refreshTokenCache.LoadOrStore(user.UserID, &sync.Map{})
-	refreshTokenMap.(*sync.Map).Store(tokenid, true)
+	log.Sys().Debug("Storing refresh token in cache", "tokenid", tokenid, "user_id", user.UserID)
+	s.refreshTokenCache.Store(rPayload.Jti, &sync.Map{})
+	return token, refreshToken, nil
+}
+
+func (s *authService) DeleteRefreshToken(token string) error {
+	// Delete the refresh token from the cache
+
+	claims, err := jwt.ParseToken(token, s.cfg.JwtSecret)
+	if err != nil {
+		log.Sys().Error("Failed to parse refresh token", "error", err)
+		return err
+	}
+
+	jti := claims.Jti
+
+	if _, ok := s.refreshTokenCache.Load(jti); ok {
+		s.refreshTokenCache.Delete(jti)
+		log.Sys().Debug("Deleted refresh token from cache", "jti", jti)
+	} else {
+		log.Sys().Debug("Refresh token not found in cache", "jti", jti)
+		return fmt.Errorf("refresh token not found")
+	}
+	return nil
+}
+
+func (s *authService) VerifyUser(ctx context.Context, username string, password string) (ret *Result, err error) {
+	user, err := s.userService.GetUserByName(username)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := auth.CheckPasswordHash(password, user.Password); err != nil {
+		return nil, err
+	}
+
+	// Generate access token
+	token, refreshToken, err := s.CreateToken(user)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Result{
 		AccessToken:  token,
@@ -100,5 +134,23 @@ func (s *authService) VerifyRefreshToken(token string) (user *model.User, err er
 	// Parse the refresh token
 	// authHeader := ctx.GetHeader("Authorization")
 
-	return nil, fmt.Errorf("not implemented")
+	claims, err := jwt.ParseToken(token, s.cfg.JwtSecret)
+	if err != nil {
+		log.Sys().Error("Failed to parse refresh token", "error", err)
+		return nil, err
+	}
+
+	if _, ok := s.refreshTokenCache.Load(claims.Jti); !ok {
+		log.Sys().Error("Refresh token not found in cache", "user_id", claims.UserID, "jti", claims.Jti)
+		return nil, fmt.Errorf("refresh token invalid")
+	}
+
+	// Get the user by ID
+	user, err = s.userService.GetUserByUserID(int64(claims.UserID))
+	if err != nil {
+		log.Sys().Error("Failed to get user by ID", "user_id", claims.UserID, "error", err)
+		return nil, err
+	}
+
+	return user, nil
 }

@@ -14,9 +14,9 @@ const (
 )
 
 const (
-	ContextLoggerKey = "logger"
-	ContextUserKey   = "user"
-	ContextRefreshTokenPayloadKey = "refresh_token_payload"
+	ContextLoggerKey       = "logger"
+	ContextUserKey         = "user"
+	ContextRefreshTokenKey = "refresh_token_payload"
 )
 
 const (
@@ -32,10 +32,12 @@ const (
 	EnvPrefix        = "LA_"
 )
 
+type RoleType string
+
 const (
-	RoleTypeUser  = "user"
-	RoleTypeAdmin = "admin"
-	RoleTypeSuper = "super"
+	RoleTypeUser  RoleType = "user"
+	RoleTypeAdmin RoleType = "admin"
+	RoleTypeSuper RoleType = "super"
 )
 
 const (

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"llmapi/src/internal/constants"
 	"llmapi/src/internal/model"
 
 	"gorm.io/gorm"
@@ -11,10 +12,11 @@ type UserRepo interface {
 	CreateUser(user *model.User) error
 	// GetUserByID retrieves a user by their ID
 	GetUserByID(id int64) (*model.User, error)
+	GetUserByUserID(userID int64) (*model.User, error)
 	GetUserByName(username string) (*model.User, error)
 	UpdateUser(user *model.User) error
 	DeleteUser(id int64) error
-	FindFirstUserByRole(role string) (*model.User, error)
+	FindFirstUserByRole(role constants.RoleType) (*model.User, error)
 }
 
 type userRepo struct {
@@ -42,6 +44,14 @@ func (r *userRepo) GetUserByID(id int64) (*model.User, error) {
 	return &user, nil
 }
 
+func (r *userRepo) GetUserByUserID(userID int64) (*model.User, error) {
+	var user model.User
+	if err := r.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *userRepo) GetUserByName(username string) (*model.User, error) {
 	var user model.User
 	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
@@ -64,7 +74,7 @@ func (r *userRepo) DeleteUser(id int64) error {
 	return nil
 }
 
-func (r *userRepo) FindFirstUserByRole(role string) (*model.User, error) {
+func (r *userRepo) FindFirstUserByRole(role constants.RoleType) (*model.User, error) {
 	var user model.User
 	if err := r.db.Where("role = ?", role).First(&user).Error; err != nil {
 		return nil, err
