@@ -1,12 +1,11 @@
-package api
+package dashboard
 
 import (
 	"net/http"
 
 	"llmapi/src/internal/constants"
-	"llmapi/src/internal/dto"
+	dto "llmapi/src/internal/dto/v1"
 	"llmapi/src/internal/model"
-	apiDto "llmapi/src/internal/router/dashboard/api/dto"
 	"llmapi/src/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -45,7 +44,7 @@ func (h *UserHandler) GetUserInfo(c *gin.Context) {
 		email = *userInfo.Email
 	}
 
-	c.JSON(http.StatusOK, apiDto.UserProfile{
+	c.JSON(http.StatusOK, dto.UserProfile{
 		UserID:   uint(userInfo.UserID),
 		Username: userInfo.Username,
 		Email:    email,

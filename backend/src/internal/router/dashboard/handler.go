@@ -8,7 +8,7 @@ import (
 
 	"llmapi/src/internal/constants"
 	"llmapi/src/internal/middleware"
-	"llmapi/src/internal/router/dashboard/api"
+	dashboardApiV1 "llmapi/src/internal/router/api/v1/dashboard"
 	"llmapi/src/internal/service"
 	"llmapi/src/internal/utils/log"
 
@@ -46,7 +46,7 @@ func setupAPIRoutes(opts *Options) {
 
 	apiGroup := engine.Group(constants.DashboardPrefix+"/api", gzip.Gzip(gzip.DefaultCompression))
 	{
-		authHandler := api.NewAuthHander(opts.UserSvc, opts.AuthSvc)
+		authHandler := dashboardApiV1.NewAuthHandler(opts.UserSvc, opts.AuthSvc)
 		apiGroup.POST("/login", authHandler.Login)
 		apiGroup.POST("/register", authHandler.Register)
 		// Additional API routes can be added here
@@ -55,7 +55,7 @@ func setupAPIRoutes(opts *Options) {
 		authenticatedGroup := apiGroup.Group("") // 创建子分组
 		authenticatedGroup.Use(authMiddleware.AccessTokenMiddleware())
 		{
-			userHandler := api.NewUserHandler(opts.UserSvc)
+			userHandler := dashboardApiV1.NewUserHandler(opts.UserSvc)
 			authenticatedGroup.POST("/profile", userHandler.GetUserInfo)
 			authenticatedGroup.POST("/update_profile", userHandler.UpdateUserInfo)
 		}

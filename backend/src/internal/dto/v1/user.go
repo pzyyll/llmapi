@@ -1,4 +1,4 @@
-package dto
+package v1
 
 // User info for login
 type UserInfo struct {
@@ -8,13 +8,12 @@ type UserInfo struct {
 
 // User info for login response
 type LoginResponse struct {
-	Token        string `json:"token"`
 	UserID       uint   `json:"user_id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	Role         string `json:"role"`
 	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	// RefreshToken string `json:"refresh_token"`
 }
 
 type LoginRequest struct {

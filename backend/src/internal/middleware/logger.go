@@ -11,8 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const requestIDHeader = "X-Request-ID"
-
 func RequestLogger() gin.HandlerFunc {
 	log := log.WithType(log.RequestType)
 	return func(c *gin.Context) {

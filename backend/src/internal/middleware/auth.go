@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"llmapi/src/internal/constants"
-	"llmapi/src/internal/dto"
+	dto "llmapi/src/internal/dto/v1"
 	"llmapi/src/internal/service"
 	"llmapi/src/pkg/auth"
 

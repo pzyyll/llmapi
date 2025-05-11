@@ -26,7 +26,7 @@ services:
       - 127.0.0.1:15432:5432
 
   redis:
-    image: "${REGISTRY:-docker.io}/redis:alpine"
+    image: redis:alpine
     # container_name: redis
     restart: unless-stopped
     volumes:
@@ -48,7 +48,8 @@ services:
       - mysql_data:/var/lib/mysql
     ports:
       - 127.0.0.1:13306:3306  # If you want to access MySQL from outside Docker, uncomment
-
+    profiles:
+      - mysql
 
 volumes:
   postgres-data: {}

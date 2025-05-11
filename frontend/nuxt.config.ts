@@ -27,7 +27,8 @@ export default defineNuxtConfig({
 		'unplugin-icons/nuxt',
 		'reka-ui/nuxt',
 		'@nuxtjs/i18n',
-		'nuxt-auth-utils'
+		'nuxt-auth-utils',
+		'pinia-plugin-persistedstate/nuxt'
 	],
 	vite: {
 		plugins: [
@@ -62,24 +63,33 @@ export default defineNuxtConfig({
 		restructureDir: 'src/i18n',
 		bundle: {
 			optimizeTranslationDirective: false
-		}
-		// strategies: {
-		// 	no_prefix: true,
-		// 	no_prefix_default_locale: false
-		// },
+		},
+		strategy: 'no_prefix',
 		// detectBrowserLanguage: {
 		// 	useCookie: true,
 		// 	cookieCrossOrigin: false,
 		// 	fallbackLocale: 'en'
 		// }
 	},
-	runtimeConfig: {
-		public: {
-			apiBase: ''
+	devServer: {
+		port: 13001,
+		host: 'localhost'
+	},
+	$production: {
+		runtimeConfig: {
+			public: {
+				apiBase: ''
+			}
+		},
+		pages: {
+			pattern: ["!**/demo/**"]
 		}
 	},
-	devServer: {
-		port: 3003,
-		host: 'localhost'
+	$development: {
+		runtimeConfig: {
+			public: {
+				apiBase: 'http://localhost:13001'
+			}
+		}
 	}
 });
