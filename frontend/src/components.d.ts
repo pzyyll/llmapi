@@ -8,7 +8,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    IcRoundHome: typeof import('~icons/ic/round-home')['default']
+    MaterialSymbolsDeleteOutlineRounded: typeof import('~icons/material-symbols/delete-outline-rounded')['default']
+    MaterialSymbolsListsRounded: typeof import('~icons/material-symbols/lists-rounded')['default']
+    MaterialSymbolsLogoutRounded: typeof import('~icons/material-symbols/logout-rounded')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

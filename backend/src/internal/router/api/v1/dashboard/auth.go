@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"llmapi/src/internal/constants"
-	"llmapi/src/internal/middleware"
 	"llmapi/src/internal/model"
 	"llmapi/src/internal/service"
+	"llmapi/src/internal/utils/log"
 
 	dto "llmapi/src/internal/dto/v1"
 
@@ -26,7 +26,7 @@ func NewAuthHandler(userService service.UserService, authService service.AuthSer
 }
 
 func (r *AuthHandler) Login(c *gin.Context) {
-	logger := middleware.GetContextLogger(c)
+	logger := log.GetContextLogger(c)
 	logger.Info("Login request received")
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -48,19 +48,12 @@ func (r *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	email := ""
-	if ret.User.Email != nil {
-		email = *ret.User.Email
-	}
+	c.SetCookie(constants.CookieNameRefreshToken, ret.RefreshToken, 0, "", "", false, true)
 
 	logger.Debug("Login successful", "user_id", ret.User.UserID, "username", ret.User.Username)
 	c.JSON(http.StatusOK, dto.LoginResponse{
 		AccessToken: ret.AccessToken,
-		// RefreshToken: ret.RefreshToken,
-		UserID:   uint(ret.User.UserID),
-		Username: ret.User.Username,
-		Email:    email,
-		Role:     ret.User.Role,
+		UserProfile: *dto.NewUser(ret.User),
 	})
 }
 
@@ -92,21 +85,52 @@ func (r *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// Set refresh token to Cookie
+	c.SetCookie(constants.CookieNameRefreshToken, refreshToken, 0, "", "", false, true)
+
 	c.JSON(http.StatusOK, dto.RegisterResponse{
-		UserID:       user.ID,
-		Username:     user.Username,
-		Role:         user.Role,
-		AccessToken:  token,
-		RefreshToken: refreshToken,
+		UserProfile: *dto.NewUser(user),
+		AccessToken: token,
 	})
 }
 
 func (r *AuthHandler) RefreshToken(c *gin.Context) {
-	user := c.MustGet(constants.ContextUserKey).(*model.User)
-	oldRefreshToken := c.MustGet(constants.ContextRefreshTokenKey).(string)
-
-	newAccessToken, newRefreshToken, err := r.authService.CreateToken(user)
+	ret, err := r.authService.RefreshToken(c)
 	if err != nil {
+		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
+			Code:  http.StatusUnauthorized,
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.SetCookie(constants.CookieNameRefreshToken, ret.RefreshToken, 0, "", "", false, true)
+
+	c.JSON(http.StatusOK, dto.RefreshTokenResponse{
+		UserProfile: *dto.NewUser(ret.User),
+		AccessToken: ret.AccessToken,
+	})
+}
+
+func (r *AuthHandler) ValidateToken(c *gin.Context) {
+	user := c.MustGet(constants.ContextUserKey).(*model.User)
+
+	c.JSON(http.StatusOK, dto.ValidateTokenResponse{
+		UserProfile: *dto.NewUser(user),
+	})
+}
+
+func (r *AuthHandler) Logout(c *gin.Context) {
+	refreshToken, err := c.Cookie(constants.CookieNameRefreshToken)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Code:  http.StatusBadRequest,
+			Error: "Bad Request",
+		})
+		return
+	}
+
+	if err := r.authService.DeleteRefreshToken(refreshToken); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Code:  http.StatusInternalServerError,
 			Error: err.Error(),
@@ -114,10 +138,10 @@ func (r *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	r.authService.DeleteRefreshToken(oldRefreshToken)
+	c.SetCookie(constants.CookieNameRefreshToken, "", -1, "", "", false, true)
 
-	c.JSON(http.StatusOK, dto.RefreshTokenResponse{
-		AccessToken:  newAccessToken,
-		RefreshToken: newRefreshToken,
+	c.JSON(http.StatusOK, dto.SuccessResponse{
+		Code:    http.StatusOK,
+		Message: "Logout successful",
 	})
 }

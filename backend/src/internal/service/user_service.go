@@ -19,6 +19,7 @@ type UserService interface {
 	GetUserByID(id int64) (*model.User, error)
 	GetUserByUserID(userID int64) (*model.User, error)
 	GetUserByName(username string) (*model.User, error)
+	GetUsers() (*[]model.User, error)
 	DeleteUser(id int64) error
 	InitAdminUser() error
 }
@@ -106,4 +107,12 @@ func (s *userService) InitAdminUser() error {
 	}
 
 	return nil
+}
+
+func (s *userService) GetUsers() (*[]model.User, error) {
+	users, err := s.userRepo.GetUsers()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get users: %w", err)
+	}
+	return users, nil
 }

@@ -1,4 +1,25 @@
 {
   "login": "登录",
-  "submit": "提交"
+  "signup": "注册",
+  "submit": "提交",
+  "home": "首页",
+  "about": "关于",
+  "dashboard": "控制面板",
+  "user": "用户",
+  "keys": "密钥",
+  "settings": "设置",
+  "models": "模型",
+  "logs": "日志",
+  "language": "语言",
+  "logout": "登出",
+  "username": "用户名",
+  "role": "角色",
+  "ID": "ID",
+  "email": "邮箱",
+  "edit": "编辑",
+  "delete": "删除",
+  "created_at": "创建时间",
+  "super_admin": "超级管理员",
+  "admin": "管理员",
+  "normal_user": "普通用户"
 }

@@ -43,6 +43,9 @@ func InitServer() error {
 
 	router = gin.New()
 
+	router.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+	router.ForwardedByClientIP = true
+
 	// Set middleware for the engine
 	router.Use(middleware.RequestLogger())
 	router.Use(gin.Recovery())

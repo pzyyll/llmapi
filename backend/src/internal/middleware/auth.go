@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"net/http"
-	"strings"
+	"slices"
 
 	"llmapi/src/internal/constants"
 	dto "llmapi/src/internal/dto/v1"
+	"llmapi/src/internal/model"
 	"llmapi/src/internal/service"
-	"llmapi/src/pkg/auth"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,31 +25,11 @@ func NewAuthMiddleware(authService service.AuthService) *AuthMiddleware {
 // AuthMiddleware is a middleware that checks if the user is authenticated
 func (a *AuthMiddleware) AccessTokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if the user is authenticated
-		protocol, token, err := auth.GetAuthorizationToken(c.GetHeader("Authorization"))
+		user, err := a.authService.VerifyCtxAccessToken(c)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
 				Code:  http.StatusUnauthorized,
-				Error: "Authorization header not found",
-			})
-			c.Abort()
-			return
-		}
-
-		if !strings.EqualFold(protocol, constants.AuthTypeBearer) {
-			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-				Code:  http.StatusUnauthorized,
-				Error: "Authorization type not supported",
-			})
-			c.Abort()
-			return
-		}
-
-		user, err := a.authService.VerifyAccessToken(token)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-				Code:  http.StatusUnauthorized,
-				Error: "Invalid access token",
+				Error: "Invalid access token: " + err.Error(),
 			})
 			c.Abort()
 			return
@@ -61,40 +41,29 @@ func (a *AuthMiddleware) AccessTokenMiddleware() gin.HandlerFunc {
 	}
 }
 
-func (a *AuthMiddleware) RefreshTokenMiddleware() gin.HandlerFunc {
+func (a *AuthMiddleware) AdminMiddleware(checkRoles ...constants.RoleType) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if the user is authenticated
-		protocol, token, err := auth.GetAuthorizationToken(c.GetHeader("Authorization"))
-		if err != nil {
+		user, ok := c.Get(constants.ContextUserKey)
+		if !ok {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
 				Code:  http.StatusUnauthorized,
-				Error: "Authorization header not found",
+				Error: "User not found in context",
 			})
 			c.Abort()
 			return
 		}
 
-		if !strings.EqualFold(protocol, constants.AuthTypeBearer) {
-			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-				Code:  http.StatusUnauthorized,
-				Error: "Authorization type not supported",
+		role := constants.RoleType(user.(*model.User).Role)
+
+		allowed := slices.Contains(checkRoles, role)
+		if !allowed {
+			c.JSON(http.StatusForbidden, dto.ErrorResponse{
+				Code:  http.StatusForbidden,
+				Error: "Permission denied",
 			})
 			c.Abort()
 			return
 		}
-
-		user, err := a.authService.VerifyRefreshToken(token)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-				Code:  http.StatusUnauthorized,
-				Error: "Invalid refresh token",
-			})
-			c.Abort()
-			return
-		}
-
-		c.Set(constants.ContextUserKey, user)
-		c.Set(constants.ContextRefreshTokenKey, token)
 
 		c.Next()
 	}

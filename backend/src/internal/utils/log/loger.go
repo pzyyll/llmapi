@@ -4,7 +4,10 @@ import (
 	"log/slog"
 	"sync"
 
+	"llmapi/src/internal/constants"
 	"llmapi/src/pkg/logger"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -27,4 +30,13 @@ func WithType(typ string) *slog.Logger {
 
 func Sys() *slog.Logger {
 	return WithType(SysType)
+}
+
+func GetContextLogger(c *gin.Context) *slog.Logger {
+	if logger, exists := c.Get(constants.ContextLoggerKey); exists {
+		if reqLogger, ok := logger.(*slog.Logger); ok {
+			return reqLogger
+		}
+	}
+	return Sys()
 }

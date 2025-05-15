@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log/slog"
 	"time"
 
 	"llmapi/src/internal/constants"
@@ -45,13 +44,4 @@ func RequestLogger() gin.HandlerFunc {
 			"duration", duration,
 		)
 	}
-}
-
-func GetContextLogger(c *gin.Context) *slog.Logger {
-	if logger, exists := c.Get(constants.ContextLoggerKey); exists {
-		if reqLogger, ok := logger.(*slog.Logger); ok {
-			return reqLogger
-		}
-	}
-	return log.Sys()
 }

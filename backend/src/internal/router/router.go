@@ -48,5 +48,6 @@ func SetupRouter(opts *Options) {
 		Engine:  engine,
 		UserSvc: userSvc,
 		AuthSvc: authSvc,
+		Cfg:     opts.Cfg,
 	})
 }

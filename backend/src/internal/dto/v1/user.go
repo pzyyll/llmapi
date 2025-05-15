@@ -1,5 +1,7 @@
 package v1
 
+import "llmapi/src/internal/model"
+
 // User info for login
 type UserInfo struct {
 	Username string `json:"username" binding:"required"`
@@ -8,21 +10,12 @@ type UserInfo struct {
 
 // User info for login response
 type LoginResponse struct {
-	UserID       uint   `json:"user_id"`
-	Username     string `json:"username"`
-	Email        string `json:"email"`
-	Role         string `json:"role"`
-	AccessToken  string `json:"access_token"`
-	// RefreshToken string `json:"refresh_token"`
+	UserProfile `json:"user"`
+	AccessToken string `json:"access_token"`
 }
 
 type LoginRequest struct {
 	UserInfo
-}
-
-type RefreshTokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
 }
 
 type RegisterRequest struct {
@@ -30,17 +23,30 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	UserID       uint   `json:"user_id"`
-	Username     string `json:"username"`
-	Role         string `json:"role"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	UserProfile `json:"user"`
+	AccessToken string `json:"access_token"`
 }
 
 type UserProfile struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
-	IsActive bool   `json:"is_active"`
+	UserID    int64   `json:"user_id"`
+	Username  string  `json:"username"`
+	Email     *string `json:"email"`
+	Role      string  `json:"role"`
+	IsActive  bool    `json:"is_active"`
+	CreatedAt string  `json:"created_at"`
+}
+
+type Users struct {
+	Users []UserProfile `json:"users"`
+}
+
+func NewUser(user *model.User) *UserProfile {
+	return &UserProfile{
+		UserID:    user.UserID,
+		Username:  user.Username,
+		Email:     user.Email,
+		Role:      user.Role,
+		IsActive:  user.IsActive,
+		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
+	}
 }

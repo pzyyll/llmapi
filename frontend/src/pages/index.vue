@@ -1,13 +1,111 @@
+<script setup lang="ts">
+definePageMeta({
+	layout: false
+});
+
+import MaterialSymbolsPersonOutlineRounded from '~icons/material-symbols/person-outline-rounded';
+import MaterialSymbolsKeyVerticalOutlineRounded from '~icons/material-symbols/key-vertical-outline-rounded';
+import MaterialSymbolsSettingsOutlineRounded from '~icons/material-symbols/settings-outline-rounded';
+import MaterialSymbolsRobot2OutlineRounded from '~icons/material-symbols/robot-2-outline-rounded';
+import MaterialSymbolsChartDataOutlineRounded from '~icons/material-symbols/chart-data-outline-rounded';
+
+const isSidebarCollapsed = ref(false);
+const toggleSidebar = () => {
+	isSidebarCollapsed.value = !isSidebarCollapsed.value;
+};
+
+const navItems = [
+	{
+		title: 'logs',
+		path: '/logs',
+		icon: MaterialSymbolsChartDataOutlineRounded
+	},
+	{
+		title: 'models',
+		path: '/models',
+		icon: MaterialSymbolsRobot2OutlineRounded
+	},
+	{
+		title: 'keys',
+		path: '/api_key',
+		icon: MaterialSymbolsKeyVerticalOutlineRounded
+	},
+	{
+		title: 'user',
+		path: '/user',
+		icon: MaterialSymbolsPersonOutlineRounded
+	},
+	{
+		title: 'settings',
+		path: '/settings',
+		icon: MaterialSymbolsSettingsOutlineRounded
+	}
+];
+
+const router = useRouter();
+const isActive = (path: string) => {
+	return router.currentRoute.value.path === path;
+};
+
+onMounted(() => {
+	const currentPath = router.currentRoute.value.path;
+	if (currentPath === '/') {
+		router.push(navItems[0].path);
+	}
+});
+</script>
+
 <template>
-	<div class="bg-base-100 rounded-md h-full">
-		<h1><IcRoundHome />Welcome to the homepage</h1>
-		<AppAlert> This is an auto-imported component </AppAlert>
-		<nav>
-			<ul>
-				<li><NuxtLink to="/about">About</NuxtLink></li>
-				<li><NuxtLink to="/demo/demopage">Post 1</NuxtLink></li>
-				<li><NuxtLink to="/demo/demopage2">Post 2</NuxtLink></li>
-			</ul>
-		</nav>
-	</div>
+	<NuxtLayout name="dashboard">
+		<template #header>
+			<NavHeader class="px-3 py-2">
+				<template #left>
+					<h1 class="text-2xl font-bold">LLMTech</h1>
+				</template>
+				<template #right>
+					<Avatar />
+				</template>
+			</NavHeader>
+		</template>
+		<template #sidebar>
+			<SideListItem
+				:showTitle="!isSidebarCollapsed"
+				:title="$t('dashboard')"
+				@click="toggleSidebar"
+				class="mx-2"
+			>
+				<template #icon>
+					<MaterialSymbolsListsRounded class="size-6" />
+				</template>
+			</SideListItem>
+
+			<nav class="py-3">
+				<ul class="flex flex-col gap-1">
+					<li v-for="item in navItems">
+						<NuxtLink :to="`${item.path}`">
+							<SideListItem
+								:showTitle="!isSidebarCollapsed"
+								:title="$t(item.title)"
+								:highlighted="isActive(item.path)"
+								:class="{
+									'opacity-50': !isActive(item.path),
+									'opacity-100': isActive(item.path)
+								}"
+								class="mx-2"
+							>
+								<template #icon>
+									<component :is="item.icon" class="size-6" />
+								</template>
+							</SideListItem>
+						</NuxtLink>
+					</li>
+					<!-- <div class="d-divider gap-0 m-0" /> -->
+				</ul>
+			</nav>
+		</template>
+
+		<div class="flex h-full flex-col pb-3 pr-3">
+			<NuxtPage />
+		</div>
+	</NuxtLayout>
 </template>

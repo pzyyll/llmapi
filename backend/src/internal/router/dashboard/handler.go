@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 
+	"llmapi/src/internal/config"
 	"llmapi/src/internal/constants"
 	"llmapi/src/internal/middleware"
 	dashboardApiV1 "llmapi/src/internal/router/api/v1/dashboard"
@@ -24,6 +25,7 @@ type Options struct {
 	Engine  *gin.Engine
 	UserSvc service.UserService
 	AuthSvc service.AuthService
+	Cfg     *config.Config
 }
 
 // SetupRouter configures all dashboard routes including API and web UI
@@ -31,7 +33,7 @@ func SetupRouter(opts *Options) {
 	engine := opts.Engine
 
 	// Configure CORS middleware
-	engine.Use(middleware.CORS())
+	engine.Use(middleware.CORS(opts.Cfg))
 
 	// Setup API routes
 	setupAPIRoutes(opts)
@@ -44,11 +46,16 @@ func SetupRouter(opts *Options) {
 func setupAPIRoutes(opts *Options) {
 	engine := opts.Engine
 
-	apiGroup := engine.Group(constants.DashboardPrefix+"/api", gzip.Gzip(gzip.DefaultCompression))
+	apiGroup := engine.Group(constants.DashboardPrefix+"/api",
+		middleware.IpLimiterMiddleware(),
+		gzip.Gzip(gzip.DefaultCompression))
 	{
 		authHandler := dashboardApiV1.NewAuthHandler(opts.UserSvc, opts.AuthSvc)
-		apiGroup.POST("/login", authHandler.Login)
-		apiGroup.POST("/register", authHandler.Register)
+
+		turnstileMiddleware := middleware.TurnstileMiddleware(opts.Cfg)
+		apiGroup.POST("/login", turnstileMiddleware, authHandler.Login)
+		apiGroup.POST("/register", turnstileMiddleware, authHandler.Register)
+		apiGroup.POST("/renew_token", authHandler.RefreshToken)
 		// Additional API routes can be added here
 
 		authMiddleware := middleware.NewAuthMiddleware(opts.AuthSvc)
@@ -56,11 +63,14 @@ func setupAPIRoutes(opts *Options) {
 		authenticatedGroup.Use(authMiddleware.AccessTokenMiddleware())
 		{
 			userHandler := dashboardApiV1.NewUserHandler(opts.UserSvc)
+			authenticatedGroup.POST("/validate_token", authHandler.ValidateToken)
 			authenticatedGroup.POST("/profile", userHandler.GetUserInfo)
 			authenticatedGroup.POST("/update_profile", userHandler.UpdateUserInfo)
-		}
+			authenticatedGroup.POST("/logout", authHandler.Logout)
 
-		apiGroup.POST("/renew_token", authMiddleware.RefreshTokenMiddleware(), authHandler.RefreshToken)
+			adminMiddleware := authMiddleware.AdminMiddleware(constants.RoleTypeAdmin, constants.RoleTypeSuper)
+			authenticatedGroup.GET("/users", adminMiddleware, userHandler.GetUsers)
+		}
 	}
 }
 

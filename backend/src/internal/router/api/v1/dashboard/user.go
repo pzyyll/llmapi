@@ -39,18 +39,7 @@ func (h *UserHandler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	email := ""
-	if userInfo.Email != nil {
-		email = *userInfo.Email
-	}
-
-	c.JSON(http.StatusOK, dto.UserProfile{
-		UserID:   uint(userInfo.UserID),
-		Username: userInfo.Username,
-		Email:    email,
-		Role:     userInfo.Role,
-		IsActive: userInfo.IsActive,
-	})
+	c.JSON(http.StatusOK, dto.NewUser(userInfo))
 }
 
 // UpdateUserInfo handles the request to update user information
@@ -58,5 +47,25 @@ func (h *UserHandler) UpdateUserInfo(c *gin.Context) {
 	// TODO: Implement the update user information logic
 	c.JSON(http.StatusOK, gin.H{
 		"message": "unimplemented",
+	})
+}
+
+func (h *UserHandler) GetUsers(c *gin.Context) {
+	users, err := h.UserService.GetUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Code:  http.StatusInternalServerError,
+			Error: "Failed to get users: " + err.Error(),
+		})
+		return
+	}
+
+	retUsers := make([]dto.UserProfile, len(*users))
+	for i, user := range *users {
+		retUsers[i] = *dto.NewUser(&user)
+	}
+
+	c.JSON(http.StatusOK, dto.Users{
+		Users: retUsers,
 	})
 }

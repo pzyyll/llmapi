@@ -14,6 +14,7 @@ type UserRepo interface {
 	GetUserByID(id int64) (*model.User, error)
 	GetUserByUserID(userID int64) (*model.User, error)
 	GetUserByName(username string) (*model.User, error)
+	GetUsers() (*[]model.User, error)
 	UpdateUser(user *model.User) error
 	DeleteUser(id int64) error
 	FindFirstUserByRole(role constants.RoleType) (*model.User, error)
@@ -80,4 +81,12 @@ func (r *userRepo) FindFirstUserByRole(role constants.RoleType) (*model.User, er
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepo) GetUsers() (*[]model.User, error) {
+	var users []model.User
+	if err := r.db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return &users, nil
 }

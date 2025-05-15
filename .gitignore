@@ -16,3 +16,7 @@ node_modules
 .vscode
 .roo
 .aider*
+
+memory-bank
+.clinerules*
+.roorules*

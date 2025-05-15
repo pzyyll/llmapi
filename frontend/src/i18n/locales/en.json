@@ -1,4 +1,25 @@
 {
-	"login": "Sign In",
-  "submit": "Submit"
+  "login": "Login",
+  "signup": "Sign Up",
+  "submit": "Submit",
+  "home": "Home",
+  "about": "About",
+  "dashboard": "Dashboard",
+  "user": "User",
+  "keys": "Keys",
+  "settings": "Settings",
+  "models": "Models",
+  "logs": "Logs",
+  "language": "Language",
+  "logout": "Log Out",
+  "username": "Username",
+  "role": "Role",
+  "ID": "ID",
+  "email": "Email",
+  "edit": "Edit",
+  "delete": "Delete",
+  "created_at": "Created At",
+  "super_admin": "Super Administrator",
+  "admin": "Administrator",
+  "normal_user": "Regular User"
 }
