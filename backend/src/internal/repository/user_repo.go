@@ -16,7 +16,7 @@ type UserRepo interface {
 	GetUserByName(username string) (*model.User, error)
 	GetUsers() (*[]model.User, error)
 	UpdateUser(user *model.User) error
-	DeleteUser(id int64) error
+	DeleteUser(user *model.User) error
 	FindFirstUserByRole(role constants.RoleType) (*model.User, error)
 }
 
@@ -47,7 +47,7 @@ func (r *userRepo) GetUserByID(id int64) (*model.User, error) {
 
 func (r *userRepo) GetUserByUserID(userID int64) (*model.User, error) {
 	var user model.User
-	if err := r.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+	if err := r.db.Where(&model.User{UserID: userID}).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -55,7 +55,7 @@ func (r *userRepo) GetUserByUserID(userID int64) (*model.User, error) {
 
 func (r *userRepo) GetUserByName(username string) (*model.User, error) {
 	var user model.User
-	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
+	if err := r.db.Where(&model.User{Username: username}).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -68,8 +68,8 @@ func (r *userRepo) UpdateUser(user *model.User) error {
 	return nil
 }
 
-func (r *userRepo) DeleteUser(id int64) error {
-	if err := r.db.Delete(&model.User{}, id).Error; err != nil {
+func (r *userRepo) DeleteUser(user *model.User) error {
+	if err := r.db.Delete(user).Error; err != nil {
 		return err
 	}
 	return nil
@@ -77,7 +77,7 @@ func (r *userRepo) DeleteUser(id int64) error {
 
 func (r *userRepo) FindFirstUserByRole(role constants.RoleType) (*model.User, error) {
 	var user model.User
-	if err := r.db.Where("role = ?", role).First(&user).Error; err != nil {
+	if err := r.db.Where(&model.User{Role: string(role)}).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

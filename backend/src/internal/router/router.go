@@ -5,6 +5,7 @@ import (
 
 	"llmapi/src/internal/config"
 	"llmapi/src/internal/repository"
+	"llmapi/src/internal/router/api/v1/llm"
 	"llmapi/src/internal/router/dashboard"
 	"llmapi/src/internal/service"
 	"llmapi/src/internal/utils"
@@ -38,16 +39,23 @@ func SetupRouter(opts *Options) {
 	userRepo := repository.NewUserRepo(opts.DB)
 	userSvc := service.NewUserService(userRepo, opts.Cfg, uidGenerator)
 
+	apiKeyRepo := repository.NewAPIKeyRepo(opts.DB)
+	apiKeySvc := service.NewAPIKeyService(userRepo, apiKeyRepo)
+
 	if err := userSvc.InitAdminUser(); err != nil {
 		log.Sys().Error("Init admin user fail.", "error", err.Error())
 	}
 
 	authSvc := service.NewAuthService(userSvc, cfg, uidGenerator)
 
+	llm.SetupRouter(engine, apiKeySvc)
+
 	dashboard.SetupRouter(&dashboard.Options{
 		Engine:  engine,
 		UserSvc: userSvc,
 		AuthSvc: authSvc,
+		APIKeySvc: apiKeySvc,
 		Cfg:     opts.Cfg,
 	})
+
 }

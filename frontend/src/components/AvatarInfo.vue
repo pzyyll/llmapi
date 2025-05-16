@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { getUser } = useAuthStore();
+
 const handleExit = async () => {
 	try {
 		await useAPI().post(RequestPath.Logout);
@@ -15,16 +17,12 @@ const handleExit = async () => {
 	<div>
 		<DropdownMenuRoot>
 			<DropdownMenuTrigger asChild>
-				<div class="d-avatar d-avatar-placeholder">
-					<button class="d-btn d-btn-info d-btn-sm d-btn-circle">
-						<span class="text-base-100 text-xl">A</span>
-					</button>
-				</div>
+				<AvatarIcon :name="getUser?.username" size="sm" />
 			</DropdownMenuTrigger>
 
 			<DropdownMenuPortal>
 				<DropdownMenuContent
-					class="d-menu bg-base-100 rounded-box shadow-xl/30 w-32 px-0"
+					class="d-menu bg-base-100 shadow-xl/30 w-32 overflow-clip rounded-md px-0"
 					align="end"
 					:alignOffset="-2"
 					side="bottom"

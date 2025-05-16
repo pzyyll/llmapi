@@ -2,11 +2,15 @@ package dashboard
 
 import (
 	"net/http"
+	"strconv"
 
 	"llmapi/src/internal/constants"
 	dto "llmapi/src/internal/dto/v1"
+	"llmapi/src/internal/middleware"
 	"llmapi/src/internal/model"
 	"llmapi/src/internal/service"
+	"llmapi/src/internal/utils/log"
+	"llmapi/src/internal/utils/role"
 
 	"github.com/gin-gonic/gin"
 )
@@ -68,4 +72,73 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.Users{
 		Users: retUsers,
 	})
+}
+
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	log := log.GetContextLogger(c)
+	user, err := middleware.GetUser(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Code:  http.StatusInternalServerError,
+			Error: err.Error(),
+		})
+		c.Abort()
+		return
+	}
+
+	if !role.IsAdmin(constants.RoleType(user.Role)) {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{
+			Code:  http.StatusForbidden,
+			Error: "Permission denied",
+		})
+		c.Abort()
+		return
+	}
+
+	userID, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Code:  http.StatusBadRequest,
+			Error: err.Error(),
+		})
+		c.Abort()
+		return
+	}
+
+	targetUser, err := h.UserService.GetUserByUserID(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Code:  http.StatusInternalServerError,
+			Error: err.Error(),
+		})
+		c.Abort()
+		return
+	}
+
+	roleLevel := role.GetRoleLevel(constants.RoleType(targetUser.Role))
+	if roleLevel >= role.GetRoleLevel(constants.RoleType(user.Role)) {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{
+			Code:  http.StatusForbidden,
+			Error: "Permission denied",
+		})
+		c.Abort()
+		return
+	}
+
+	log.Info("Deleting user", "user_id", userID)
+	err = h.UserService.DeleteUser(targetUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Code:  http.StatusInternalServerError,
+			Error: err.Error(),
+		})
+		c.Abort()
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.SuccessResponse{
+		Code:    http.StatusOK,
+		Message: "User deleted successfully",
+	})
+	c.Abort()
 }

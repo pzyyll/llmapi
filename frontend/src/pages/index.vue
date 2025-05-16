@@ -8,37 +8,45 @@ import MaterialSymbolsKeyVerticalOutlineRounded from '~icons/material-symbols/ke
 import MaterialSymbolsSettingsOutlineRounded from '~icons/material-symbols/settings-outline-rounded';
 import MaterialSymbolsRobot2OutlineRounded from '~icons/material-symbols/robot-2-outline-rounded';
 import MaterialSymbolsChartDataOutlineRounded from '~icons/material-symbols/chart-data-outline-rounded';
+import AvatarInfo from '~/components/AvatarInfo.vue';
 
 const isSidebarCollapsed = ref(false);
 const toggleSidebar = () => {
 	isSidebarCollapsed.value = !isSidebarCollapsed.value;
 };
 
+const { isAdmin } = useAuthStore();
+
 const navItems = [
 	{
 		title: 'logs',
 		path: '/logs',
-		icon: MaterialSymbolsChartDataOutlineRounded
+		icon: MaterialSymbolsChartDataOutlineRounded,
+		visible: true
 	},
 	{
 		title: 'models',
 		path: '/models',
-		icon: MaterialSymbolsRobot2OutlineRounded
+		icon: MaterialSymbolsRobot2OutlineRounded,
+		visible: true
 	},
 	{
 		title: 'keys',
 		path: '/api_key',
-		icon: MaterialSymbolsKeyVerticalOutlineRounded
+		icon: MaterialSymbolsKeyVerticalOutlineRounded,
+		visible: true
 	},
 	{
 		title: 'user',
 		path: '/user',
-		icon: MaterialSymbolsPersonOutlineRounded
+		icon: MaterialSymbolsPersonOutlineRounded,
+		visible: isAdmin
 	},
 	{
 		title: 'settings',
 		path: '/settings',
-		icon: MaterialSymbolsSettingsOutlineRounded
+		icon: MaterialSymbolsSettingsOutlineRounded,
+		visible: true
 	}
 ];
 
@@ -58,12 +66,12 @@ onMounted(() => {
 <template>
 	<NuxtLayout name="dashboard">
 		<template #header>
-			<NavHeader class="px-3 py-2">
+			<NavHeader class="px-3 py-2 h-13">
 				<template #left>
 					<h1 class="text-2xl font-bold">LLMTech</h1>
 				</template>
 				<template #right>
-					<Avatar />
+					<AvatarInfo />
 				</template>
 			</NavHeader>
 		</template>
@@ -81,7 +89,7 @@ onMounted(() => {
 
 			<nav class="py-3">
 				<ul class="flex flex-col gap-1">
-					<li v-for="item in navItems">
+					<li v-for="item in navItems.filter((i) => i.visible)" :key="item.path">
 						<NuxtLink :to="`${item.path}`">
 							<SideListItem
 								:showTitle="!isSidebarCollapsed"

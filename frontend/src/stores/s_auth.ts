@@ -9,6 +9,10 @@ export const useAuthStore = defineStore(
 		const isLoggedIn = computed(() => !!accessToken.value);
 		const getToken = computed(() => accessToken.value);
 		const getUser = computed(() => user.value);
+		const isAdmin = computed(() => {
+			if (!user.value) return false;
+			return user.value.role === Role.Admin || user.value.role === Role.Super;
+		});
 
 		const setUser = (newUser: Dto.User) => {
 			user.value = newUser;
@@ -28,6 +32,10 @@ export const useAuthStore = defineStore(
 			clearToken();
 		};
 
+		const isSelf = (userId: string) => {
+			return user.value?.user_id === userId;
+		};
+
 		return {
 			// State
 			accessToken,
@@ -37,6 +45,7 @@ export const useAuthStore = defineStore(
 			isLoggedIn,
 			getToken,
 			getUser,
+			isAdmin,
 
 			setUser,
 			setToken,
@@ -44,7 +53,10 @@ export const useAuthStore = defineStore(
 			// Actions
 			clearUser,
 			clearToken,
-			clearAuth
+			clearAuth,
+
+			// Methods
+			isSelf
 		};
 	},
 	{

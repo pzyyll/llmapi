@@ -17,6 +17,7 @@ const (
 	ContextLoggerKey       = "logger"
 	ContextUserKey         = "user"
 	ContextRefreshTokenKey = "refresh_token_payload"
+	ContentAPIRecordKey    = "api_key_record"
 )
 
 const (
@@ -39,6 +40,20 @@ const (
 	RoleTypeAdmin RoleType = "admin"
 	RoleTypeSuper RoleType = "super"
 )
+
+type RoleLevel int
+
+const (
+	RoleLevelLow RoleLevel = iota
+	RoleLevelMedium
+	RoleLevelHigh
+)
+
+var RoleLevelMap = map[RoleType]RoleLevel{
+	RoleTypeUser:  RoleLevelLow,
+	RoleTypeAdmin: RoleLevelMedium,
+	RoleTypeSuper: RoleLevelHigh,
+}
 
 const (
 	PasswordMinLength = 8

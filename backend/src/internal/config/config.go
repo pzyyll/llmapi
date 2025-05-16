@@ -43,7 +43,7 @@ func initDefaultConfig() *Config {
 		DSN:                "sqlite://llmapi.db",
 		RedisURL:           "",
 		JwtSecret:          "",
-		AccessTokenExpiry:  60,
+		AccessTokenExpiry:  3600,
 		RefreshTokenExpiry: 30 * 24 * 60 * 60, // 30 days
 		JwtIssuer:          "llmapi",
 		JwtSignedMethod:    "HS256",

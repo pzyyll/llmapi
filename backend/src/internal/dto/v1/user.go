@@ -1,6 +1,9 @@
 package v1
 
-import "llmapi/src/internal/model"
+import (
+	"llmapi/src/internal/model"
+	"strconv"
+)
 
 // User info for login
 type UserInfo struct {
@@ -27,8 +30,12 @@ type RegisterResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
+type DeleteUserRequest struct {
+	UserID int64 `json:"user_id" binding:"required"`
+}
+
 type UserProfile struct {
-	UserID    int64   `json:"user_id"`
+	UserID    string   `json:"user_id"`
 	Username  string  `json:"username"`
 	Email     *string `json:"email"`
 	Role      string  `json:"role"`
@@ -42,7 +49,7 @@ type Users struct {
 
 func NewUser(user *model.User) *UserProfile {
 	return &UserProfile{
-		UserID:    user.UserID,
+		UserID:    strconv.FormatInt(user.UserID, 10),
 		Username:  user.Username,
 		Email:     user.Email,
 		Role:      user.Role,

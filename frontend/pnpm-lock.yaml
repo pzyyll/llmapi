@@ -11,6 +11,9 @@ importers:
       '@pinia/nuxt':
         specifier: 0.11.0
         version: 0.11.0(magicast@0.3.5)(pinia@3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)))
+      animate.css:
+        specifier: ^4.1.1
+        version: 4.1.1
       axios:
         specifier: ^1.9.0
         version: 1.9.0
@@ -75,6 +78,9 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.1
         version: 10.1.1(eslint@9.24.0(jiti@2.4.2))
+      gsap:
+        specifier: ^3.13.0
+        version: 3.13.0
       nuxt:
         specifier: ^3.16.2
         version: 3.16.2(@parcel/watcher@2.5.1)(@types/node@22.14.0)(db0@0.3.1)(eslint@9.24.0(jiti@2.4.2))(ioredis@5.6.0)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.39.0)(terser@5.39.0)(typescript@5.8.3)(vite@6.2.5(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
@@ -1672,6 +1678,9 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
+  animate.css@4.1.1:
+    resolution: {integrity: sha512-+mRmCTv6SbCmtYJCN4faJMNFVNN5EuCTTprDTAo7YzIGji2KADmakjVA3+8mVDkZ2Bf09vayB35lSQIex2+QaQ==}
+
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -2684,6 +2693,9 @@ packages:
 
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
+
+  gsap@3.13.0:
+    resolution: {integrity: sha512-QL7MJ2WMjm1PHWsoFrAQH/J8wUeqZvMtHO58qdekHpCfhvhSL4gSiz6vJf5EeMP0LOn3ZCprL2ki/gjED8ghVw==}
 
   gzip-size@7.0.0:
     resolution: {integrity: sha512-O1Ld7Dr+nqPnmGpdhzLmMTQ4vAsD+rHwMm1NLUmoUFFymBOMKxCCrtDxqdBRYXdeEPEi3SyoR4TizJLQrnKBNA==}
@@ -6635,6 +6647,8 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
+  animate.css@4.1.1: {}
+
   ansi-regex@5.0.1: {}
 
   ansi-regex@6.1.0: {}
@@ -7715,6 +7729,8 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   graphemer@1.4.0: {}
+
+  gsap@3.13.0: {}
 
   gzip-size@7.0.0:
     dependencies:

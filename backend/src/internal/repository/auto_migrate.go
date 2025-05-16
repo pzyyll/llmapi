@@ -11,6 +11,7 @@ func AutoMigrate(db *gorm.DB) error {
 	// This is a safe operation, but will change existing columns if they are not compatible with the new schema.
 	if err := db.AutoMigrate(
 		&model.User{},
+		&model.APIKeyRecord{},
 	); err != nil {
 		return err
 	}

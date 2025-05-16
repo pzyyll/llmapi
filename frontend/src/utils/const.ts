@@ -13,7 +13,11 @@ export enum RequestPath {
 	Logout = '/api/logout',
 	UserInfo = '/api/user_info',
 	RenewToken = '/api/renew_token',
-	Users = '/api/users'
+	Users = '/api/users',
+	DeleteUser = '/api/delete_user',
+	CreateKey = '/api/create_api_key',
+	GetKeys = '/api/api_keys',
+	DeleteKey = '/api/delete_api_key'
 }
 
 export enum Role {

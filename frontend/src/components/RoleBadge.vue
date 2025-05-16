@@ -10,7 +10,7 @@ const roleColorMap = {
 </script>
 
 <template>
-	<span :class="roleColorMap[props.role as Role]" class="d-badge d-badge-sm rounded-sm">
+	<span :class="roleColorMap[props.role as Role]" class="d-badge d-badge-sm whitespace-nowrap">
 		{{ $t(RoleNames[props.role as Role]) }}
 	</span>
 </template>

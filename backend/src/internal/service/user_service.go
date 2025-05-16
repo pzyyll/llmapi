@@ -20,7 +20,7 @@ type UserService interface {
 	GetUserByUserID(userID int64) (*model.User, error)
 	GetUserByName(username string) (*model.User, error)
 	GetUsers() (*[]model.User, error)
-	DeleteUser(id int64) error
+	DeleteUser(user *model.User) error
 	InitAdminUser() error
 }
 
@@ -87,14 +87,14 @@ func (s *userService) GetUserByName(username string) (*model.User, error) {
 	return s.userRepo.GetUserByName(username)
 }
 
-func (s *userService) DeleteUser(id int64) error {
-	return s.userRepo.DeleteUser(id)
+func (s *userService) DeleteUser(user *model.User) error {
+	return s.userRepo.DeleteUser(user)
 }
 
 func (s *userService) InitAdminUser() error {
 	_, err := s.userRepo.FindFirstUserByRole(constants.RoleTypeSuper)
 	if err == nil {
-		return fmt.Errorf("Admin user is init")
+		return fmt.Errorf("admin user is initialized")
 	}
 
 	if err != gorm.ErrRecordNotFound {

@@ -12,6 +12,7 @@ import (
 	dashboardApiV1 "llmapi/src/internal/router/api/v1/dashboard"
 	"llmapi/src/internal/service"
 	"llmapi/src/internal/utils/log"
+	"llmapi/src/internal/utils/role"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
@@ -22,10 +23,11 @@ import (
 var StaticDistFS embed.FS
 
 type Options struct {
-	Engine  *gin.Engine
-	UserSvc service.UserService
-	AuthSvc service.AuthService
-	Cfg     *config.Config
+	Engine    *gin.Engine
+	UserSvc   service.UserService
+	AuthSvc   service.AuthService
+	APIKeySvc service.APIKeyService
+	Cfg       *config.Config
 }
 
 // SetupRouter configures all dashboard routes including API and web UI
@@ -68,8 +70,14 @@ func setupAPIRoutes(opts *Options) {
 			authenticatedGroup.POST("/update_profile", userHandler.UpdateUserInfo)
 			authenticatedGroup.POST("/logout", authHandler.Logout)
 
-			adminMiddleware := authMiddleware.AdminMiddleware(constants.RoleTypeAdmin, constants.RoleTypeSuper)
+			adminMiddleware := authMiddleware.AdminMiddleware(role.GetRoleLevel(constants.RoleTypeAdmin))
 			authenticatedGroup.GET("/users", adminMiddleware, userHandler.GetUsers)
+			authenticatedGroup.DELETE("/delete_user", adminMiddleware, userHandler.DeleteUser)
+
+			apiKeyHandler := dashboardApiV1.NewApiKeyHandler(opts.APIKeySvc)
+			authenticatedGroup.POST("/create_api_key", adminMiddleware, apiKeyHandler.CreateApiKey)
+			authenticatedGroup.GET("/api_keys", adminMiddleware, apiKeyHandler.GetApiKeys)
+			authenticatedGroup.DELETE("/delete_api_key", adminMiddleware, apiKeyHandler.DeleteApiKey)
 		}
 	}
 }

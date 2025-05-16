@@ -19,6 +19,9 @@ const username = ref('');
 const password = ref('');
 const cft_token = ref('');
 
+const turnstileRef = ref<{ reset: () => void } | null>(null);
+const isLoading = ref(false);
+
 const isTurnstileEnabled = computed(() => turnstile.siteKey.length > 0);
 
 const isFormInvalid = computed(() => {
@@ -27,6 +30,11 @@ const isFormInvalid = computed(() => {
 	return false;
 });
 
+function resetTurnstile() {
+	cft_token.value = '';
+	turnstileRef.value?.reset();
+}
+
 async function handleLogin() {
 	try {
 		const headers: Record<string, string> = {};
@@ -34,6 +42,7 @@ async function handleLogin() {
 			headers[Header.TurnstileToken] = cft_token.value;
 		}
 
+		isLoading.value = true;
 		const { data } = await useAPI().post<Dto.LoginResponse>(
 			RequestPath.Login,
 			{
@@ -53,24 +62,34 @@ async function handleLogin() {
 		navigateTo('/');
 	} catch (error) {
 		console.error('Login failed:', error);
+	} finally {
+		isLoading.value = false;
+		resetTurnstile();
 	}
 }
 
 async function turnstileExpired() {
-	cft_token.value = '';
+	resetTurnstile();
 }
 </script>
 
 <template>
-	<div class="flex h-screen items-center justify-center">
-		<div class="bg-base-100 sm:w-90 flex w-full flex-col justify-center p-4 sm:rounded-2xl">
-			<form @submit.prevent="handleLogin" class="flex flex-col items-center gap-4">
+	<div class="flex h-screen flex-col items-center justify-center">
+		<div
+			class="bg-base-100 sm:w-90 relative flex w-full flex-col justify-center overflow-hidden sm:rounded-2xl"
+		>
+			<progress
+				class="d-progress absolute left-0 top-0 w-full rounded-none"
+				v-if="isLoading"
+			></progress>
+			<form @submit.prevent="handleLogin" class="flex flex-col items-center gap-4 p-4">
 				<input
 					type="text"
 					placeholder="Username"
 					required
 					v-model="username"
 					class="d-input d-input-ghost w-full"
+					:disabled="isLoading"
 				/>
 				<input
 					type="password"
@@ -78,6 +97,7 @@ async function turnstileExpired() {
 					required
 					v-model="password"
 					class="d-input d-input-ghost w-full"
+					:disabled="isLoading"
 				/>
 				<NuxtTurnstile
 					v-model="cft_token"
@@ -85,8 +105,9 @@ async function turnstileExpired() {
 					:options="{
 						expiredCallback: turnstileExpired
 					}"
+					ref="turnstileRef"
 				/>
-				<button type="submit" class="d-btn w-full" :disabled="isFormInvalid">
+				<button type="submit" class="d-btn w-full" :disabled="isFormInvalid || isLoading">
 					{{ $t('login') }}
 				</button>
 			</form>

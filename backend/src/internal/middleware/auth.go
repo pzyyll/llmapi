@@ -2,12 +2,11 @@ package middleware
 
 import (
 	"net/http"
-	"slices"
 
 	"llmapi/src/internal/constants"
 	dto "llmapi/src/internal/dto/v1"
-	"llmapi/src/internal/model"
 	"llmapi/src/internal/service"
+	"llmapi/src/internal/utils/role"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,22 +40,20 @@ func (a *AuthMiddleware) AccessTokenMiddleware() gin.HandlerFunc {
 	}
 }
 
-func (a *AuthMiddleware) AdminMiddleware(checkRoles ...constants.RoleType) gin.HandlerFunc {
+func (a *AuthMiddleware) AdminMiddleware(roleLevel constants.RoleLevel) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user, ok := c.Get(constants.ContextUserKey)
-		if !ok {
+		user, err := GetUser(c)
+		if err != nil {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
 				Code:  http.StatusUnauthorized,
-				Error: "User not found in context",
+				Error: err.Error(),
 			})
 			c.Abort()
 			return
 		}
 
-		role := constants.RoleType(user.(*model.User).Role)
-
-		allowed := slices.Contains(checkRoles, role)
-		if !allowed {
+		userRoleLevel := role.GetRoleLevel(constants.RoleType(user.Role))
+		if userRoleLevel < roleLevel {
 			c.JSON(http.StatusForbidden, dto.ErrorResponse{
 				Code:  http.StatusForbidden,
 				Error: "Permission denied",
