@@ -6,6 +6,7 @@ const (
 	Author          = "Pzyyll"
 	License         = "MIT"
 	DashboardPrefix = "/dashboard"
+	APIPrefix       = "/api/v1"
 )
 
 const (

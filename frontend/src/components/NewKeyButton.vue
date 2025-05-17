@@ -14,13 +14,13 @@ const keyCreating = ref(false);
 
 async function handleSubmit() {
 	try {
-		name = secretKeyName.value ? secretKeyName.value : 'Secret Key';
-		console.log('name: ', name, secretKeyName.value);
+		const secretName = secretKeyName.value ? secretKeyName.value : 'Secret Key';
+		console.log('name: ', secretName, secretKeyName.value);
 		if (keyCreating.value) return;
 
 		keyCreating.value = true;
 		const { data } = await useAPI().post<Dto.CreateKeyResponse>(RequestPath.CreateKey, {
-			name
+			name: secretName
 		});
 
 		console.log('new key: ', data);
@@ -49,27 +49,27 @@ async function handleCopy() {
 	}
 }
 
-function handleInteractOutside(event) {
+function handleInteractOutside(event: Event) {
 	if (createSuccess.value || keyCreating.value) {
 		event.preventDefault();
 	}
 }
 
-function overlayFadeIn(el, done) {
+function overlayFadeIn(el: any, done: () => void) {
 	gsap.from(el, {
 		duration: 0.2,
 		opacity: 0,
 		onComplete: done
 	});
 }
-function overlayFadeOut(el, done) {
+function overlayFadeOut(el: any, done: () => void) {
 	gsap.to(el, {
 		duration: 0.2,
 		opacity: 0,
 		onComplete: done
 	});
 }
-function contentFadeIn(el, done) {
+function contentFadeIn(el: any, done: () => void) {
 	gsap.from(el, {
 		duration: 0.2,
 		// scale: 0.8,
@@ -78,7 +78,7 @@ function contentFadeIn(el, done) {
 		onComplete: done
 	});
 }
-function contentFadeOut(el, done) {
+function contentFadeOut(el: any, done: () => void) {
 	gsap.to(el, {
 		duration: 0.2,
 		// scale: 0.8,

@@ -3,7 +3,6 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/base64"
-	"strings"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -47,24 +46,12 @@ func EncodeSha256(
 	return encodedHash
 }
 
-func KeyBrief(apiKey string) string {
-	const minLengthForNoPrefixAbbreviation = 7 // "..." + 4 个字符
-	const lastCharsToKeep = 4
+func KeyBrief(apiKey string, prefix string) string {
+	startIndex := len(prefix) + 2
+	endIndex := len(apiKey) - 4
 
-	parts := strings.SplitN(apiKey, "-", 2)
-	if len(parts) == 2 && len(parts[0]) > 0 {
-		prefix := parts[0] + "-"
-		secretPart := parts[1]
-
-		if len(secretPart) > lastCharsToKeep {
-			return prefix + "..." + secretPart[len(secretPart)-lastCharsToKeep:]
-		}
-		return prefix + "..." + secretPart
+	if startIndex >= endIndex {
+		return "..."
 	}
-
-	if len(apiKey) > minLengthForNoPrefixAbbreviation {
-		return "..." + apiKey[len(apiKey)-lastCharsToKeep:]
-	}
-
-	return apiKey
+	return apiKey[:startIndex] + "..." + apiKey[endIndex:]
 }

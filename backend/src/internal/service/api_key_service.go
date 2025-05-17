@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	DefaultAPIKeyPrefix     = "llm-"
+	DefaultAPIKeyPrefix     = "sk-llm-v1-"
 	SecretPartLengthBytes   = 32 // 32 bytes = 256 bits of entropy
 	Argon2DefaultTime       = 1
 	Argon2DefaultMemory     = 64 * 1024 // 64MB
@@ -76,7 +76,7 @@ func (s *apiKeyService) CreateAPIKey(user *model.User, name string, scopes int64
 		LookupKey:   lookupKey,
 		SecretHash:  encodeKeyHash,
 		Salt:        encodedSalt,
-		SecretBrief: utils.KeyBrief(fullAPIKey),
+		SecretBrief: utils.KeyBrief(fullAPIKey, prefix),
 		Scopes:      scopes,
 		ExpiresAt:   nil,
 	}

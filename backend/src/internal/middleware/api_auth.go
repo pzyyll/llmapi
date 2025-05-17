@@ -6,6 +6,7 @@ import (
 	"llmapi/src/internal/constants"
 	dto "llmapi/src/internal/dto/v1"
 	"llmapi/src/internal/service"
+	"llmapi/src/internal/utils/log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +14,9 @@ import (
 func APIAuthMiddleware(apiKeyService service.APIKeyService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get the API key from the request header
+		log := log.GetContextLogger(c)
+		log.Debug("APIAuthMiddleware: Start")
+
 		token, err := GetAPIAuthToken(c)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{

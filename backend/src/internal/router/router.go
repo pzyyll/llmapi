@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"llmapi/src/internal/config"
+	"llmapi/src/internal/middleware"
 	"llmapi/src/internal/repository"
 	"llmapi/src/internal/router/api/v1/llm"
 	"llmapi/src/internal/router/dashboard"
@@ -29,11 +30,9 @@ func SetupRouter(opts *Options) {
 	engine := opts.Engine
 	cfg := opts.Cfg
 
-	engine.GET("/ping", Ping)
-
 	uidGenerator, err := utils.NewUidGenerator(cfg.WorkerID)
 	if err != nil {
-		panic(fmt.Errorf("Get uid generator fail %v", err.Error()))
+		panic(fmt.Errorf("get uid generator fail %v", err.Error()))
 	}
 
 	userRepo := repository.NewUserRepo(opts.DB)
@@ -48,14 +47,14 @@ func SetupRouter(opts *Options) {
 
 	authSvc := service.NewAuthService(userSvc, cfg, uidGenerator)
 
+	engine.Use(middleware.RedirectToV1Middleware())
 	llm.SetupRouter(engine, apiKeySvc)
 
 	dashboard.SetupRouter(&dashboard.Options{
-		Engine:  engine,
-		UserSvc: userSvc,
-		AuthSvc: authSvc,
+		Engine:    engine,
+		UserSvc:   userSvc,
+		AuthSvc:   authSvc,
 		APIKeySvc: apiKeySvc,
-		Cfg:     opts.Cfg,
+		Cfg:       opts.Cfg,
 	})
-
 }
