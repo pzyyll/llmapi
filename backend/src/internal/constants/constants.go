@@ -1,12 +1,13 @@
 package constants
 
 const (
-	AppName         = "LLMAPI"
-	Version         = "0.0.1"
-	Author          = "Pzyyll"
-	License         = "MIT"
-	DashboardPrefix = "/dashboard"
-	APIPrefix       = "/api/v1"
+	AppName          = "LLMAPI"
+	Version          = "0.0.1"
+	Author           = "Pzyyll"
+	License          = "MIT"
+	DashboardPrefix  = "/"
+	DashboardApiPath = "/_dashboard"
+	APIPrefix        = "/api"
 )
 
 const (

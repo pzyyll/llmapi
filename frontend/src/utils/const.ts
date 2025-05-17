@@ -8,16 +8,16 @@ export enum Status {
 }
 
 export enum RequestPath {
-	Login = '/api/login',
-	Register = '/api/register',
-	Logout = '/api/logout',
-	UserInfo = '/api/user_info',
-	RenewToken = '/api/renew_token',
-	Users = '/api/users',
-	DeleteUser = '/api/delete_user',
-	CreateKey = '/api/create_api_key',
-	GetKeys = '/api/api_keys',
-	DeleteKey = '/api/delete_api_key'
+	Login = '/_dashboard/login',
+	Register = '/_dashboard/register',
+	Logout = '/_dashboard/logout',
+	UserInfo = '/_dashboard/user_info',
+	RenewToken = '/_dashboard/renew_token',
+	Users = '/_dashboard/users',
+	DeleteUser = '/_dashboard/delete_user',
+	CreateKey = '/_dashboard/create_api_key',
+	GetKeys = '/_dashboard/api_keys',
+	DeleteKey = '/_dashboard/delete_api_key'
 }
 
 export enum Role {

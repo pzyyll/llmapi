@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 
 	"llmapi/src/internal/config"
 	"llmapi/src/internal/constants"
@@ -48,7 +49,7 @@ func SetupRouter(opts *Options) {
 func setupAPIRoutes(opts *Options) {
 	engine := opts.Engine
 
-	apiGroup := engine.Group(constants.DashboardPrefix+"/api",
+	apiGroup := engine.Group(path.Join(constants.DashboardPrefix, constants.DashboardApiPath),
 		middleware.IpLimiterMiddleware(),
 		gzip.Gzip(gzip.DefaultCompression))
 	{

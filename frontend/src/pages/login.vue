@@ -54,12 +54,16 @@ async function handleLogin() {
 			}
 		);
 
-		const { setUser, setToken } = useAuthStore();
-
-		// console.log('Login successful:', data);
-		setUser(data.user);
-		setToken(data.access_token);
-		navigateTo('/');
+		if (data.user && data.access_token) {
+			console.log('Login successful:', data);
+			const authStore = useAuthStore();
+			authStore.setUser(data.user);
+			authStore.setToken(data.access_token);
+			navigateTo('/');
+		} else {
+			console.error('Login failed: Invalid response', data);
+			throw new Error('Invalid response');
+		}
 	} catch (error) {
 		console.error('Login failed:', error);
 	} finally {

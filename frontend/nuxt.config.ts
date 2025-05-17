@@ -11,9 +11,6 @@ export default defineNuxtConfig({
 	devtools: { enabled: true },
 	ssr: false,
 	srcDir: 'src',
-	app: {
-		baseURL: '/dashboard'
-	},
 	css: ['~/assets/css/main.css'],
 	nitro: {
 		output: {
@@ -94,7 +91,7 @@ export default defineNuxtConfig({
 					// This can be overridden at runtime via the NUXT_PUBLIC_TURNSTILE_SITE_KEY environment variable.
 					siteKey: ''
 				}
-			},
+			}
 		},
 		pages: {
 			pattern: ['!**/demo/**']
@@ -103,7 +100,7 @@ export default defineNuxtConfig({
 	$development: {
 		runtimeConfig: {
 			public: {
-				apiBase: '/dashboard/proxy/',
+				apiBase: '/proxy/',
 				goBase: 'http://localhost:13140/',
 				turnstile: {
 					// This can be overridden at runtime via the NUXT_PUBLIC_TURNSTILE_SITE_KEY environment variable.

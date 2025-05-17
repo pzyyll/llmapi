@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const goApiBase = config.public.goBase
   const slug = event.context.params?.slug || ''
-  const targetPath = `/dashboard/${slug}`
+  const targetPath = `/${slug}`
 
   // 获取原始查询参数
   const originalQuery = getQuery(event)
