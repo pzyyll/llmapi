@@ -27,7 +27,6 @@ export default defineNuxtConfig({
 		'unplugin-icons/nuxt',
 		'reka-ui/nuxt',
 		'@nuxtjs/i18n',
-		'nuxt-auth-utils',
 		'pinia-plugin-persistedstate/nuxt',
 		'@nuxt/scripts',
 		'@nuxtjs/turnstile'
