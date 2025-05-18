@@ -11,9 +11,7 @@ definePageMeta({
 	]
 });
 
-const {
-	public: { turnstile }
-} = useRuntimeConfig();
+const settings = useSettingsStore();
 
 const username = ref('');
 const password = ref('');
@@ -22,11 +20,9 @@ const cft_token = ref('');
 const turnstileRef = ref<{ reset: () => void } | null>(null);
 const isLoading = ref(false);
 
-const isTurnstileEnabled = computed(() => turnstile.siteKey.length > 0);
-
 const isFormInvalid = computed(() => {
 	if (!username.value || !password.value) return true;
-	if (isTurnstileEnabled.value && !cft_token.value) return true;
+	if (settings.isTurnstileEnabled && !cft_token.value) return true;
 	return false;
 });
 
@@ -38,7 +34,7 @@ function resetTurnstile() {
 async function handleLogin() {
 	try {
 		const headers: Record<string, string> = {};
-		if (isTurnstileEnabled.value) {
+		if (settings.isTurnstileEnabled) {
 			headers[Header.TurnstileToken] = cft_token.value;
 		}
 
@@ -75,6 +71,16 @@ async function handleLogin() {
 async function turnstileExpired() {
 	resetTurnstile();
 }
+
+onMounted(() => {
+	console.log('Login page mounted: ', {
+		turnstileSiteKey: settings.turnstileSiteKey,
+		isTurnstileEnabled: settings.isTurnstileEnabled
+	});
+	if (settings.isTurnstileEnabled) {
+		resetTurnstile();
+	}
+});
 </script>
 
 <template>
@@ -105,11 +111,14 @@ async function turnstileExpired() {
 				/>
 				<NuxtTurnstile
 					v-model="cft_token"
-					v-if="isTurnstileEnabled"
+					v-if="settings.isTurnstileEnabled"
 					:options="{
-						expiredCallback: turnstileExpired
+						expiredCallback: turnstileExpired,
+						size: 'flexible'
 					}"
 					ref="turnstileRef"
+					:site-key="settings.turnstileSiteKey"
+					class="w-full px-3"
 				/>
 				<button type="submit" class="d-btn w-full" :disabled="isFormInvalid || isLoading">
 					{{ $t('login') }}

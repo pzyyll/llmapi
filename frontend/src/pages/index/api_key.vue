@@ -103,10 +103,12 @@ onMounted(async () => {
 					</thead>
 					<TransitionGroup name="list" tag="tbody" :css="false" @enter="onEnter" @leave="onLeave">
 						<tr v-for="key in keys" :key="key.name" class="border-base-content/10 border-b">
-							<td class="first:pl-0 last:pr-0">{{ key.name }}</td>
-							<td class="first:pl-0 last:pr-0">{{ key.secret_brief }}</td>
-							<td class="first:pl-0 last:pr-0">{{ formatDateTimeString(key.created_at) }}</td>
-							<td class="first:pl-0 last:pr-0">
+							<td class="whitespace-nowrap first:pl-0 last:pr-0">{{ key.name }}</td>
+							<td class="whitespace-nowrap first:pl-0 last:pr-0">{{ key.secret_brief }}</td>
+							<td class="whitespace-nowrap first:pl-0 last:pr-0">
+								{{ formatDateTimeString(key.created_at) }}
+							</td>
+							<td class="whitespace-nowrap first:pl-0 last:pr-0">
 								{{ key.last_used_at ? formatDateTimeString(key.last_used_at) : $t('never') }}
 							</td>
 							<td class="flex items-center justify-end first:pl-0 last:pr-0">

@@ -53,12 +53,14 @@ func setupAPIRoutes(opts *Options) {
 		middleware.IpLimiterMiddleware(),
 		gzip.Gzip(gzip.DefaultCompression))
 	{
+		apiGroup.GET("/load_settings", dashboardApiV1.LoadSettingsHandler(opts.Cfg))
+		
 		authHandler := dashboardApiV1.NewAuthHandler(opts.UserSvc, opts.AuthSvc)
+		apiGroup.POST("/renew_token", authHandler.RefreshToken)
 
 		turnstileMiddleware := middleware.TurnstileMiddleware(opts.Cfg)
 		apiGroup.POST("/login", turnstileMiddleware, authHandler.Login)
 		apiGroup.POST("/register", turnstileMiddleware, authHandler.Register)
-		apiGroup.POST("/renew_token", authHandler.RefreshToken)
 		// Additional API routes can be added here
 
 		authMiddleware := middleware.NewAuthMiddleware(opts.AuthSvc)

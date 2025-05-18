@@ -48,5 +48,9 @@ declare global {
 			key: Key;
 			secret: string;
 		}
+
+		interface LoadSettings {
+			turnstile_site_key: string;
+		}
 	}
 }

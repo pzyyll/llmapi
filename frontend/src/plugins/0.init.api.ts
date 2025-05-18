@@ -1,4 +1,4 @@
-import { StatusCodes } from 'http-status-codes';
+import { HttpStatusCode } from 'axios';
 import axios from 'axios';
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -21,6 +21,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 			return config;
 		},
 		(error) => {
+			console.error('Error in request interceptor:', error);
 			return Promise.reject(error);
 		}
 	);
@@ -31,9 +32,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 		},
 		async (error) => {
 			const originalRequest = error.config;
-			if (
-				error.response.status === StatusCodes.UNAUTHORIZED
-			) {
+			if (error.response.status === HttpStatusCode.Unauthorized) {
 				if (originalRequest._retry || originalRequest.url === RequestPath.RenewToken) {
 					console.error('Token refresh failed, redirecting to login');
 					authStore.clearAuth();
@@ -51,6 +50,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 					// await nuxtApp.runWithContext(() => navigateTo('/login'));
 					return Promise.reject(err);
 				}
+			} else if (error.response.status === HttpStatusCode.BadGateway) {
+				console.error('Bad Gateway error:', error);
+				showError({
+					statusCode: error.response.status
+				});
 			}
 			return Promise.reject(error);
 		}

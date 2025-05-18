@@ -1,3 +1,4 @@
+import { AxiosError, HttpStatusCode } from 'axios';
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
 	// Check if the user is authenticated
@@ -14,8 +15,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 			authStore.setToken(data.access_token);
 			authStore.setUser(data.user);
 			return;
-		} catch (error) {
+		} catch (error: any) {
+			// TODO: if bad gateway, show error page
 			console.error('Error while checking user authentication:', error);
+			return;
 		}
 	}
 

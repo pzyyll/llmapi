@@ -15,48 +15,50 @@ import (
 )
 
 type Config struct {
-	Port               int      `koanf:"port" validate:"min=1,max=65535"`
-	Host               string   `koanf:"host" validate:"hostname|ip"`
-	DSN                string   `koanf:"dsn"`
-	RedisURL           string   `koanf:"redis_url"`
-	AccessTokenExpiry  int      `koanf:"access_token_expiry" validate:"min=1"`
-	RefreshTokenExpiry int      `koanf:"refresh_token_expiry" validate:"min=1"`
-	JwtSecret          string   `koanf:"jwt_secret"`
-	JwtIssuer          string   `koanf:"jwt_issuer"`
-	JwtSignedMethod    string   `koanf:"jwt_signed_method" validate:"oneof=HS256 HS384 HS512"`
-	LogLevel           string   `koanf:"log_level" validate:"oneof=debug info warn error"`
-	DBLogLevel         int      `koanf:"db_log_level" validate:"min=1,max=4"` // 1: Silent, 2: Error, 3: Warn, 4: Info
-	DBAutoMigrate      bool     `koanf:"db_auto_migrate"`
-	WorkerID           int64    `koanf:"worker_id"` // Unique identifier for the worker, used in distributed systems
-	AdminUser          string   `koanf:"admin_user"`
-	AdminPassword      string   `koanf:"admin_password"`
-	AllowOrigins       []string `koanf:"allow_origins"` // Comma-separated list of allowed origins for CORS
-	TurnstileSecretKey string   `koanf:"turnstile_secret_key"`
-	TurnstileEnabled   bool     `koanf:"turnstile_enabled"`
-	TurnstileVerifyEndpoint  string   `koanf:"turnstile_verify_endpoint"`
+	Port                    int      `koanf:"port" validate:"min=1,max=65535"`
+	Host                    string   `koanf:"host" validate:"hostname|ip"`
+	DSN                     string   `koanf:"dsn"`
+	RedisURL                string   `koanf:"redis_url"`
+	AccessTokenExpiry       int      `koanf:"access_token_expiry" validate:"min=1"`
+	RefreshTokenExpiry      int      `koanf:"refresh_token_expiry" validate:"min=1"`
+	JwtSecret               string   `koanf:"jwt_secret"`
+	JwtIssuer               string   `koanf:"jwt_issuer"`
+	JwtSignedMethod         string   `koanf:"jwt_signed_method" validate:"oneof=HS256 HS384 HS512"`
+	LogLevel                string   `koanf:"log_level" validate:"oneof=debug info warn error"`
+	DBLogLevel              int      `koanf:"db_log_level" validate:"min=1,max=4"` // 1: Silent, 2: Error, 3: Warn, 4: Info
+	DBAutoMigrate           bool     `koanf:"db_auto_migrate"`
+	WorkerID                int64    `koanf:"worker_id"` // Unique identifier for the worker, used in distributed systems
+	AdminUser               string   `koanf:"admin_user"`
+	AdminPassword           string   `koanf:"admin_password"`
+	AllowOrigins            []string `koanf:"allow_origins"` // Comma-separated list of allowed origins for CORS
+	TurnstileSiteKey        string   `koanf:"turnstile_site_key"`
+	TurnstileSecretKey      string   `koanf:"turnstile_secret_key"`
+	TurnstileEnabled        bool     `koanf:"turnstile_enabled"`
+	TurnstileVerifyEndpoint string   `koanf:"turnstile_verify_endpoint"`
 }
 
 func initDefaultConfig() *Config {
 	return &Config{
-		Port:               13140,
-		Host:               "localhost",
-		DSN:                "sqlite://llmapi.db",
-		RedisURL:           "",
-		JwtSecret:          "",
-		AccessTokenExpiry:  3600,
-		RefreshTokenExpiry: 30 * 24 * 60 * 60, // 30 days
-		JwtIssuer:          "llmapi",
-		JwtSignedMethod:    "HS256",
-		LogLevel:           "info",
-		DBLogLevel:         1,
-		DBAutoMigrate:      true,
-		WorkerID:           1,
-		AdminUser:          "admin",
-		AdminPassword:      "zaq12wsx@0",
-		AllowOrigins:       []string{"*"}, // Default to allow all origins
-		TurnstileSecretKey: "",
-		TurnstileEnabled:   false,
-		TurnstileVerifyEndpoint:  "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+		Port:                    13140,
+		Host:                    "localhost",
+		DSN:                     "sqlite://llmapi.db",
+		RedisURL:                "",
+		JwtSecret:               "",
+		AccessTokenExpiry:       3600,
+		RefreshTokenExpiry:      30 * 24 * 60 * 60, // 30 days
+		JwtIssuer:               "llmapi",
+		JwtSignedMethod:         "HS256",
+		LogLevel:                "info",
+		DBLogLevel:              1,
+		DBAutoMigrate:           true,
+		WorkerID:                1,
+		AdminUser:               "admin",
+		AdminPassword:           "zaq12wsx@0",
+		AllowOrigins:            []string{"*"}, // Default to allow all origins
+		TurnstileSiteKey:        "",
+		TurnstileSecretKey:      "",
+		TurnstileEnabled:        false,
+		TurnstileVerifyEndpoint: "https://challenges.cloudflare.com/turnstile/v0/siteverify",
 	}
 }
 

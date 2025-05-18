@@ -1,5 +1,10 @@
 # LLMAPI
 
+Why reinvent the wheel? Because I'm bored... 
+Just kidding. 
+I'm learning Golang and need a practical project to understand it more deeply. 
+It just so happens that I have a need to aggregate API models from various channels, so I rebuilt this based on a familiar requirement. Therefore, this is a practical project for practice, and completeness is not guaranteed.
+
 ## 数据库连接 (DSN)
 
 支持的数据库连接字符串格式：

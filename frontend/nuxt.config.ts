@@ -26,7 +26,8 @@ export default defineNuxtConfig({
 		'@nuxtjs/i18n',
 		'pinia-plugin-persistedstate/nuxt',
 		'@nuxt/scripts',
-		'@nuxtjs/turnstile'
+		'@nuxtjs/turnstile',
+		'@vueuse/nuxt'
 	],
 	vite: {
 		plugins: [
@@ -94,18 +95,14 @@ export default defineNuxtConfig({
 			}
 		},
 		pages: {
-			pattern: ['!**/demo/**']
+			pattern: ['**', '!demo/**']
 		}
 	},
 	$development: {
 		runtimeConfig: {
 			public: {
 				apiBase: '/proxy/',
-				goBase: 'http://localhost:13140/',
-				turnstile: {
-					// This can be overridden at runtime via the NUXT_PUBLIC_TURNSTILE_SITE_KEY environment variable.
-					siteKey: '0x4AAAAAABdJ7yz22densFFG'
-				}
+				goBase: 'http://localhost:13140/'
 			}
 		}
 	},
@@ -139,6 +136,9 @@ export default defineNuxtConfig({
 				}
 			}
 			setMiddleware(pages);
-		}
+		},
+		'prerender:routes'({ routes }) {
+			routes.clear(); // Do not generate any routes (except the defaults)
+		} // This will clear all routes, including the default ones, (SPA mode, only the root index.html needed.)
 	}
 });

@@ -13,28 +13,27 @@
 		"generate:locales": "uv run ./scripts/ai_auto_localization.py"
 	},
 	"dependencies": {
-		"@pinia/nuxt": "0.11.0",
-		"animate.css": "^4.1.1",
-		"axios": "^1.9.0",
-		"http-status-codes": "^2.3.0",
-		"pinia": "^3.0.2",
-		"pinia-plugin-persistedstate": "^4.3.0",
-		"vue": "^3.5.14",
-		"vue-router": "^4.5.1",
 		"@nuxt/fonts": "0.11.4",
 		"@nuxt/scripts": "0.11.6",
-		"@nuxtjs/i18n": "9.5.4",
+		"@nuxtjs/turnstile": "1.0.0",
+		"@pinia/nuxt": "0.11.0",
 		"@unhead/vue": "^2.0.8",
+		"axios": "^1.9.0",
 		"gsap": "^3.13.0",
 		"nuxt": "3.17.3",
+		"pathe": "^2.0.3",
+		"pinia": "^3.0.2",
+		"pinia-plugin-persistedstate": "^4.3.0",
 		"reka-ui": "^2.2.1",
-		"@nuxtjs/turnstile": "1.0.0"
+		"vue": "^3.5.14",
+		"vue-router": "^4.5.1"
 	},
 	"packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
 	"devDependencies": {
 		"@iconify-json/ic": "^1.2.2",
 		"@iconify-json/material-symbols": "^1.2.21",
 		"@nuxt/eslint": "1.4.0",
+		"@nuxtjs/i18n": "9.5.4",
 		"@tailwindcss/typography": "^0.5.16",
 		"@tailwindcss/vite": "^4.1.7",
 		"@types/node": "^22.15.18",
@@ -46,6 +45,7 @@
 		"tailwindcss": "^4.1.7",
 		"typescript": "^5.8.3",
 		"unplugin-icons": "^22.1.0",
-		"unplugin-vue-components": "^28.5.0"
+		"unplugin-vue-components": "^28.5.0",
+		"@vueuse/nuxt": "13.2.0"
 	}
 }

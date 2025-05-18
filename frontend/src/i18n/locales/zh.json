@@ -41,5 +41,11 @@
   "create_key_description": "请将密匙保存在安全的地方，因为{create_key_description_bold}。请妥善保管，因为任何持有您 API 密钥的人都可以代表您发出请求。如果丢失，您需要重新生成一个。",
   "create_key_description_bold": "您将无法再次查看它",
   "copy": "复制",
-  "create_key_desc_on_empty": "创建一个新的 API 密钥以访问所有模型。"
+  "create_key_desc_on_empty": "创建一个新的 API 密钥以访问所有模型。",
+  "go_home": "返回首页",
+  "page_not_found": "页面未找到",
+  "page_not_found_desc": "抱歉，我们无法找到您要访问的页面，请检查 URL 或返回首页。",
+  "bad_gateway": "网络错误",
+  "bad_gateway_desc": "抱歉，发生了网络错误。请稍后再试。",
+  "refresh_page": "刷新页面"
 }

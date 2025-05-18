@@ -2,7 +2,9 @@ package llm
 
 import (
 	"net/http"
+	"path"
 
+	"llmapi/src/internal/constants"
 	"llmapi/src/internal/middleware"
 	"llmapi/src/internal/service"
 
@@ -16,7 +18,7 @@ func TestPing(c *gin.Context) {
 func SetupRouter(router *gin.Engine, apiKeyService service.APIKeyService) {
 	apiAuthMid := middleware.APIAuthMiddleware(apiKeyService)
 
-	apiAuthGroup := router.Group("v1", apiAuthMid)
+	apiAuthGroup := router.Group(path.Join(constants.APIPrefix, "v1"), apiAuthMid)
 	{
 		apiAuthGroup.Match([]string{http.MethodGet, http.MethodPost}, "/ping", TestPing)
 	}

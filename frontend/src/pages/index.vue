@@ -1,20 +1,5 @@
 <script setup lang="ts">
-definePageMeta({
-	layout: false
-});
-
-import MaterialSymbolsPersonOutlineRounded from '~icons/material-symbols/person-outline-rounded';
-import MaterialSymbolsKeyVerticalOutlineRounded from '~icons/material-symbols/key-vertical-outline-rounded';
-import MaterialSymbolsSettingsOutlineRounded from '~icons/material-symbols/settings-outline-rounded';
-import MaterialSymbolsRobot2OutlineRounded from '~icons/material-symbols/robot-2-outline-rounded';
-import MaterialSymbolsChartDataOutlineRounded from '~icons/material-symbols/chart-data-outline-rounded';
-import AvatarInfo from '~/components/AvatarInfo.vue';
-
-const isSidebarCollapsed = ref(false);
-const toggleSidebar = () => {
-	isSidebarCollapsed.value = !isSidebarCollapsed.value;
-};
-
+import path from 'pathe';
 const { isAdmin } = useAuthStore();
 
 const navItems = [
@@ -49,6 +34,29 @@ const navItems = [
 		visible: true
 	}
 ];
+
+definePageMeta({
+	layout: false,
+	redirect: (to) => {
+		console.log("Index page redirecting from: ", to.path, " to: ", path.join(to.path, navItems[0].path));
+		return path.join(to.path, navItems[0].path);
+	}
+});
+
+import MaterialSymbolsPersonOutlineRounded from '~icons/material-symbols/person-outline-rounded';
+import MaterialSymbolsKeyVerticalOutlineRounded from '~icons/material-symbols/key-vertical-outline-rounded';
+import MaterialSymbolsSettingsOutlineRounded from '~icons/material-symbols/settings-outline-rounded';
+import MaterialSymbolsRobot2OutlineRounded from '~icons/material-symbols/robot-2-outline-rounded';
+import MaterialSymbolsChartDataOutlineRounded from '~icons/material-symbols/chart-data-outline-rounded';
+import AvatarInfo from '~/components/AvatarInfo.vue';
+
+const isSidebarCollapsed = ref(false);
+const toggleSidebar = () => {
+	isSidebarCollapsed.value = !isSidebarCollapsed.value;
+};
+
+
+
 
 const router = useRouter();
 const isActive = (path: string) => {

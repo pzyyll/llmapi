@@ -8,6 +8,7 @@ export enum Status {
 }
 
 export enum RequestPath {
+	LoadSettings = '/_dashboard/load_settings',
 	Login = '/_dashboard/login',
 	Register = '/_dashboard/register',
 	Logout = '/_dashboard/logout',

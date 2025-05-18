@@ -8,6 +8,7 @@ const (
 	DashboardPrefix  = "/"
 	DashboardApiPath = "/_dashboard"
 	APIPrefix        = "/api"
+	APIVersion       = "v1"
 )
 
 const (

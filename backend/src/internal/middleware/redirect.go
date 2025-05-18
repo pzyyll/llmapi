@@ -2,7 +2,10 @@ package middleware
 
 import (
 	"net/http"
+	"path"
 	"strings"
+
+	"llmapi/src/internal/constants"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,11 +13,12 @@ import (
 func RedirectToV1Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Redirect to v1
-		path := c.Request.URL.Path
+		targetPath := c.Request.URL.Path
+		apiVersion := path.Join(constants.APIPrefix, constants.APIVersion)
 
-		if strings.HasPrefix(path, "/api") && !strings.HasPrefix(path, "/api/v1") {
-			// Redirect to v1
-			c.Redirect(http.StatusMovedPermanently, "/api/v1"+path[len("/api"):])
+		if strings.HasPrefix(targetPath, constants.APIPrefix) && !strings.HasPrefix(targetPath, apiVersion) {
+			// Default API Redirect to v1
+			c.Redirect(http.StatusMovedPermanently, path.Join(apiVersion, targetPath[len(constants.APIPrefix):]))
 			c.Abort()
 			return
 		}
