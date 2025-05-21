@@ -56,6 +56,19 @@ const onLeave = (el: Element, done: () => void) => {
 	});
 };
 
+const onConfirmEditKey = async (key: Dto.Key) => {
+	try {
+		for (let i = 0; i < keys.value.length; i++) {
+			if (keys.value[i].lookup_key === key.lookup_key) {
+				keys.value[i].name = key.name;
+				break;
+			}
+		}
+	} catch (error) {
+		console.error('Edit Key Error', error);
+	}
+};
+
 onMounted(async () => {
 	// get keys from API
 	try {
@@ -71,9 +84,9 @@ onMounted(async () => {
 </script>
 
 <template>
-	<DashboardMainLayout :title="$t('keys')" :on-loading="onDataFetching">
+	<MainLayout :title="$t('keys')" :on-loading="onDataFetching">
 		<template #header-right>
-			<NewKeyButton @on-key-created="onKeyCreated" />
+			<KeyNewButton @on-key-created="onKeyCreated" />
 		</template>
 		<div class="flex flex-col gap-4">
 			<article class="prose prose-sm text-base-content">
@@ -112,10 +125,7 @@ onMounted(async () => {
 								{{ key.last_used_at ? formatDateTimeString(key.last_used_at) : $t('never') }}
 							</td>
 							<td class="flex items-center justify-end first:pl-0 last:pr-0">
-								<button class="d-btn d-btn-ghost d-btn-xs">
-									<MaterialSymbolsEditSquareOutlineRounded class="size-4" />
-								</button>
-
+								<KeyEditButton :key-info="key" @on-key-changed="onConfirmEditKey" />
 								<ConfirmDialog @confirm="deleteKey(key.lookup_key)" :title="$t('delete_key')">
 									<button
 										class="d-btn d-btn-ghost d-btn-xs hover:bg-error/20 active:bg-error/20 focus:outline-error hover:border-transparent focus:border-transparent focus:bg-transparent active:border-transparent"
@@ -139,5 +149,5 @@ onMounted(async () => {
 				</table>
 			</div>
 		</div>
-	</DashboardMainLayout>
+	</MainLayout>
 </template>

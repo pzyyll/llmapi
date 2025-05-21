@@ -81,6 +81,7 @@ func setupAPIRoutes(opts *Options) {
 			authenticatedGroup.POST("/create_api_key", adminMiddleware, apiKeyHandler.CreateApiKey)
 			authenticatedGroup.GET("/api_keys", adminMiddleware, apiKeyHandler.GetApiKeys)
 			authenticatedGroup.DELETE("/delete_api_key", adminMiddleware, apiKeyHandler.DeleteApiKey)
+			authenticatedGroup.PUT("/update_api_key/:key", adminMiddleware, apiKeyHandler.UpdateApiKey)
 		}
 	}
 }

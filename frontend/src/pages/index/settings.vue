@@ -3,7 +3,7 @@ const { locale, locales, setLocale } = useI18n();
 </script>
 
 <template>
-	<DashboardMainLayout :title="$t('settings')">
+	<MainLayout :title="$t('settings')">
 		<div class="flex flex-col gap-4 p-4">
 			<div name="language" class="flex flex-col gap-2">
 				<div class="flex flex-col gap-2">
@@ -18,5 +18,5 @@ const { locale, locales, setLocale } = useI18n();
 				</div>
 			</div>
 		</div>
-	</DashboardMainLayout>
+	</MainLayout>
 </template>

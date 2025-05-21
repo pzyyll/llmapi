@@ -38,7 +38,7 @@ func (r *apiKeyRepo) GetByLookupHash(lookupHash string) (*model.APIKeyRecord, er
 }
 
 func (r *apiKeyRepo) Update(key *model.APIKeyRecord) error {
-	return r.db.Save(key).Error
+	return r.db.Model(key).Select("Name", "Scopes", "ExpiresAt").Updates(key).Error
 }
 
 func (r *apiKeyRepo) Delete(key *model.APIKeyRecord) error {

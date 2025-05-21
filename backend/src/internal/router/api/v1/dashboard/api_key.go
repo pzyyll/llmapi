@@ -18,7 +18,7 @@ type ApiKeyHandler interface {
 	// DeleteApiKey deletes an API key for the user
 	DeleteApiKey(c *gin.Context)
 	// UpdateApiKey updates an API key for the user
-	// UpdateApiKey(c *gin.Context)
+	UpdateApiKey(c *gin.Context)
 }
 
 type apiKeyHandler struct {
@@ -62,7 +62,7 @@ func (h *apiKeyHandler) CreateApiKey(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.CreateApiKeyResponse{
 		ApiKey: *dto.ToAPIKeyProfile(apiKeyRecord),
-		Secret:        apiKey,
+		Secret: apiKey,
 	})
 }
 
@@ -96,15 +96,6 @@ func (h *apiKeyHandler) GetApiKeys(c *gin.Context) {
 }
 
 func (h *apiKeyHandler) DeleteApiKey(c *gin.Context) {
-	// user, err := middleware.GetUser(c)
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-	// 		Code:  http.StatusInternalServerError,
-	// 		Error: err.Error(),
-	// 	})
-	// 	return
-	// }
-
 	lookupKey := c.Query("lookup_key")
 	if lookupKey == "" {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
@@ -126,5 +117,62 @@ func (h *apiKeyHandler) DeleteApiKey(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{
 		Message: "API key deleted successfully",
+	})
+}
+
+func (h *apiKeyHandler) UpdateApiKey(c *gin.Context) {
+	lookupKey := c.Param("key")
+	if lookupKey == "" {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Code:  http.StatusBadRequest,
+			Error: "lookup_key is required",
+		})
+		c.Abort()
+		return
+	}
+	apiKeyRecord, err := h.apiKeyService.GetAPIKeyRecordByLookupKey(lookupKey)
+	if err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{
+			Code:  http.StatusNotFound,
+			Error: "API key not found",
+		})
+		return
+	}
+
+	var req dto.UpdateApiKeyRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Code:  http.StatusBadRequest,
+			Error: "Invalid request",
+		})
+		return
+	}
+
+	hasChanged := false
+
+	if req.Name != "" && apiKeyRecord.Name != req.Name {
+		apiKeyRecord.Name = req.Name
+		hasChanged = true
+	}
+
+	if !hasChanged {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Code:  http.StatusBadRequest,
+			Error: "No changes",
+		})
+		return
+	}
+
+	err = h.apiKeyService.UpdateAPIKeyRecord(apiKeyRecord)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Code:  http.StatusInternalServerError,
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.SuccessResponse{
+		Message: "Updated successfully",
 	})
 }

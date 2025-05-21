@@ -40,6 +40,10 @@ type GetApiKeysResponse struct {
 	APIKeys []APIKeyProfile `json:"api_keys"`
 }
 
+type UpdateApiKeyRequest struct {
+	Name string `json:"name"`
+}
+
 func ToAPIKeyProfile(apiKey *model.APIKeyRecord) *APIKeyProfile {
 	return &APIKeyProfile{
 		UserID:      strconv.FormatInt(apiKey.UserID, 10),

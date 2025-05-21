@@ -31,7 +31,7 @@ onMounted(async () => {
 </script>
 
 <template>
-	<DashboardMainLayout :title="$t('user')">
+	<MainLayout :title="$t('user')">
 		<div class="container mx-auto flex max-w-5xl flex-col">
 			<div class="rounded-box border-base-content/10 bg-base-100 overflow-x-auto border">
 				<table class="d-table w-full">
@@ -91,5 +91,5 @@ onMounted(async () => {
 				</table>
 			</div>
 		</div>
-	</DashboardMainLayout>
+	</MainLayout>
 </template>

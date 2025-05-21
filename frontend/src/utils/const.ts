@@ -18,7 +18,8 @@ export enum RequestPath {
 	DeleteUser = '/_dashboard/delete_user',
 	CreateKey = '/_dashboard/create_api_key',
 	GetKeys = '/_dashboard/api_keys',
-	DeleteKey = '/_dashboard/delete_api_key'
+	DeleteKey = '/_dashboard/delete_api_key',
+	UpdateKey = '/_dashboard/update_api_key',
 }
 
 export enum Role {

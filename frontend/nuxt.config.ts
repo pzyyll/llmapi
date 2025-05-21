@@ -107,36 +107,6 @@ export default defineNuxtConfig({
 		}
 	},
 	hooks: {
-		'pages:extend': (pages) => {
-			function setMiddleware(pages: NuxtPage[]) {
-				for (const page of pages) {
-					// console.log(page);
-					if (page.name === 'index') {
-						page.meta ||= {};
-						// middleware appened `mid_auth`
-						// Ensure page.meta.middleware is an array
-						// Nuxt middleware can be a string, an array, or undefined.
-						if (typeof page.meta.middleware === 'string') {
-							// If it's a single middleware string, convert it to an array
-							page.meta.middleware = [page.meta.middleware];
-						} else if (!Array.isArray(page.meta.middleware)) {
-							// If it's undefined or not an array (and not a string), initialize as an empty array
-							page.meta.middleware = [];
-						}
-
-						// Now, page.meta.middleware is guaranteed to be an array.
-						// Add 'mid-auth' if it's not already present.
-						if (!page.meta.middleware.includes('mid-auth')) {
-							page.meta.middleware.push('mid-auth');
-						}
-					}
-					if (page.children) {
-						setMiddleware(page.children);
-					}
-				}
-			}
-			setMiddleware(pages);
-		},
 		'prerender:routes'({ routes }) {
 			routes.clear(); // Do not generate any routes (except the defaults)
 		} // This will clear all routes, including the default ones, (SPA mode, only the root index.html needed.)

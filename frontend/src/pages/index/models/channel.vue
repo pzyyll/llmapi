@@ -1,5 +1,5 @@
 <template>
 	<div>
-		<h3 class="mb-4 text-2xl font-bold">To Do</h3>
+		<p class="mb-4 font-bold">All Channels</p>
 	</div>
 </template>

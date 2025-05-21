@@ -34,8 +34,10 @@ type APIKeyService interface {
 	GetAPIKeys(user *model.User) ([]*model.APIKeyRecord, error)
 	GetAPIKeyRecordByToken(token string) (*model.APIKeyRecord, error)
 	ValidateAPIKey(token string) (*model.APIKeyRecord, *model.User, error)
+	GetAPIKeyRecordByLookupKey(lookupKey string) (*model.APIKeyRecord, error)
 	DeleteAPIKeyRecordByLookupKey(lookupKey string) error
 	DeleteAPIKeyRecord(token string) error
+	UpdateAPIKeyRecord(apiKey *model.APIKeyRecord) error
 }
 
 type apiKeyService struct {
@@ -134,6 +136,10 @@ func (s *apiKeyService) DeleteAPIKeyRecord(token string) error {
 	return s.apiKeyRepo.Delete(apiKey)
 }
 
+func (s *apiKeyService) GetAPIKeyRecordByLookupKey(lookupKey string) (*model.APIKeyRecord, error) {
+	return s.apiKeyRepo.GetByLookupHash(lookupKey)
+}
+
 func (s *apiKeyService) DeleteAPIKeyRecordByLookupKey(lookupKey string) error {
 	return s.apiKeyRepo.DeleteByLookupKey(lookupKey)
 }
@@ -154,4 +160,8 @@ func (s *apiKeyService) ValidateAPIKey(token string) (*model.APIKeyRecord, *mode
 	}
 
 	return apiKeyRecord, user, nil
+}
+
+func (s *apiKeyService) UpdateAPIKeyRecord(apiKey *model.APIKeyRecord) error {
+	return s.apiKeyRepo.Update(apiKey)
 }

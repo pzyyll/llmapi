@@ -1,3 +1,3 @@
 <template>
-	<DashboardMainLayout :title="$t('logs')"> </DashboardMainLayout>
+	<MainLayout :title="$t('logs')"> </MainLayout>
 </template>

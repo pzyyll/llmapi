@@ -1,45 +1,54 @@
 <script setup lang="ts">
 import path from 'pathe';
+import { type FunctionalComponent, type SVGAttributes } from 'vue';
 const { isAdmin } = useAuthStore();
 
-const navItems = [
-	{
-		title: 'logs',
-		path: '/logs',
-		icon: MaterialSymbolsChartDataOutlineRounded,
-		visible: true
-	},
-	{
-		title: 'models',
-		path: '/models',
-		icon: MaterialSymbolsRobot2OutlineRounded,
-		visible: true
-	},
-	{
-		title: 'keys',
-		path: '/api_key',
-		icon: MaterialSymbolsKeyVerticalOutlineRounded,
-		visible: true
-	},
-	{
-		title: 'user',
-		path: '/user',
-		icon: MaterialSymbolsPersonOutlineRounded,
-		visible: isAdmin
-	},
-	{
-		title: 'settings',
-		path: '/settings',
-		icon: MaterialSymbolsSettingsOutlineRounded,
-		visible: true
-	}
-];
+interface NavItem {
+	title: string;
+	path: string;
+	icon: FunctionalComponent<SVGAttributes, {}, any, {}>;
+	visible: boolean;
+}
+
+const navItems: ComputedRef<NavItem[]> = computed(() => {
+	return [
+		{
+			title: 'logs',
+			path: '/logs',
+			icon: MaterialSymbolsChartDataOutlineRounded,
+			visible: true
+		},
+		{
+			title: 'models',
+			path: '/models',
+			icon: MaterialSymbolsRobot2OutlineRounded,
+			visible: true
+		},
+		{
+			title: 'keys',
+			path: '/api_key',
+			icon: MaterialSymbolsKeyVerticalOutlineRounded,
+			visible: true
+		},
+		{
+			title: 'user',
+			path: '/user',
+			icon: MaterialSymbolsPersonOutlineRounded,
+			visible: isAdmin
+		},
+		{
+			title: 'settings',
+			path: '/settings',
+			icon: MaterialSymbolsSettingsOutlineRounded,
+			visible: true
+		}
+	];
+});
 
 definePageMeta({
 	layout: false,
 	redirect: (to) => {
-		console.log("Index page redirecting from: ", to.path, " to: ", path.join(to.path, navItems[0].path));
-		return path.join(to.path, navItems[0].path);
+		return path.join(to.path, '/logs');
 	}
 });
 
@@ -55,26 +64,23 @@ const toggleSidebar = () => {
 	isSidebarCollapsed.value = !isSidebarCollapsed.value;
 };
 
+// const router = useRouter();
+// const isActive = (path: string) => {
+// 	return router.currentRoute.value.path.startsWith(path);
+// };
 
-
-
-const router = useRouter();
-const isActive = (path: string) => {
-	return router.currentRoute.value.path === path;
-};
-
-onMounted(() => {
-	const currentPath = router.currentRoute.value.path;
-	if (currentPath === '/') {
-		router.push(navItems[0].path);
-	}
-});
+// onMounted(() => {
+// 	const currentPath = router.currentRoute.value.path;
+// 	if (currentPath === '/') {
+// 		router.push(navItems.value[0].path);
+// 	}
+// });
 </script>
 
 <template>
 	<NuxtLayout name="dashboard">
 		<template #header>
-			<NavHeader class="px-3 py-2 h-13">
+			<NavHeader class="h-13 px-3 py-2">
 				<template #left>
 					<h1 class="text-2xl font-bold">LLMTech</h1>
 				</template>
@@ -97,15 +103,15 @@ onMounted(() => {
 
 			<nav class="py-3">
 				<ul class="flex flex-col gap-1">
-					<li v-for="item in navItems.filter((i) => i.visible)" :key="item.path">
-						<NuxtLink :to="`${item.path}`">
+					<li v-for="item in navItems.filter((i: NavItem) => i.visible)" :key="item.path">
+						<NuxtLink :to="`${item.path}`" v-slot="{ isActive }">
 							<SideListItem
 								:showTitle="!isSidebarCollapsed"
 								:title="$t(item.title)"
-								:highlighted="isActive(item.path)"
+								:highlighted="isActive"
 								:class="{
-									'opacity-50': !isActive(item.path),
-									'opacity-100': isActive(item.path)
+									'opacity-50': !isActive,
+									'opacity-100': isActive
 								}"
 								class="mx-2"
 							>
