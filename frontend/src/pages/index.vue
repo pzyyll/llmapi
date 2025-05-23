@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import path from 'pathe';
 import { type FunctionalComponent, type SVGAttributes } from 'vue';
-const { isAdmin } = useAuthStore();
+import MaterialSymbolsPersonOutlineRounded from '~icons/material-symbols/person-outline-rounded';
+import MaterialSymbolsKeyVerticalOutlineRounded from '~icons/material-symbols/key-vertical-outline-rounded';
+import MaterialSymbolsSettingsOutlineRounded from '~icons/material-symbols/settings-outline-rounded';
+import MaterialSymbolsRobot2OutlineRounded from '~icons/material-symbols/robot-2-outline-rounded';
+import MaterialSymbolsChartDataOutlineRounded from '~icons/material-symbols/chart-data-outline-rounded';
+import AvatarInfo from '~/components/AvatarInfo.vue';
+
+definePageMeta({
+	layout: false,
+	redirect: (to) => {
+		return path.join(to.path, '/logs');
+	}
+});
 
 interface NavItem {
 	title: string;
@@ -9,6 +21,8 @@ interface NavItem {
 	icon: FunctionalComponent<SVGAttributes, {}, any, {}>;
 	visible: boolean;
 }
+
+const { isAdmin } = useAuthStore();
 
 const navItems: ComputedRef<NavItem[]> = computed(() => {
 	return [
@@ -45,36 +59,10 @@ const navItems: ComputedRef<NavItem[]> = computed(() => {
 	];
 });
 
-definePageMeta({
-	layout: false,
-	redirect: (to) => {
-		return path.join(to.path, '/logs');
-	}
-});
-
-import MaterialSymbolsPersonOutlineRounded from '~icons/material-symbols/person-outline-rounded';
-import MaterialSymbolsKeyVerticalOutlineRounded from '~icons/material-symbols/key-vertical-outline-rounded';
-import MaterialSymbolsSettingsOutlineRounded from '~icons/material-symbols/settings-outline-rounded';
-import MaterialSymbolsRobot2OutlineRounded from '~icons/material-symbols/robot-2-outline-rounded';
-import MaterialSymbolsChartDataOutlineRounded from '~icons/material-symbols/chart-data-outline-rounded';
-import AvatarInfo from '~/components/AvatarInfo.vue';
-
 const isSidebarCollapsed = ref(false);
 const toggleSidebar = () => {
 	isSidebarCollapsed.value = !isSidebarCollapsed.value;
 };
-
-// const router = useRouter();
-// const isActive = (path: string) => {
-// 	return router.currentRoute.value.path.startsWith(path);
-// };
-
-// onMounted(() => {
-// 	const currentPath = router.currentRoute.value.path;
-// 	if (currentPath === '/') {
-// 		router.push(navItems.value[0].path);
-// 	}
-// });
 </script>
 
 <template>

@@ -31,65 +31,68 @@ onMounted(async () => {
 </script>
 
 <template>
-	<MainLayout :title="$t('user')">
-		<div class="container mx-auto flex max-w-5xl flex-col">
-			<div class="rounded-box border-base-content/10 bg-base-100 overflow-x-auto border">
-				<table class="d-table w-full">
-					<!-- head -->
-					<colgroup>
-						<col class="w-2/5" />
-						<col class="w-1/5" />
-						<col class="w-1/5" />
-					</colgroup>
-					<tbody>
-						<tr
-							v-for="user in users?.users"
-							:key="user.user_id"
-							class="border-base-content/10 border-b"
-						>
-							<td>
-								<div class="flex items-center gap-2">
-									<AvatarIcon :name="user.username" />
-									<div class="flex items-center gap-1">
-										<p>
-											{{ user.username }}
-										</p>
-										<div
-											class="d-badge d-badge-info bg-info/30 d-badge-xs border-0"
-											v-if="isSelf(user.user_id)"
-										>
-											{{ $t('you') }}
+	<MainLayout>
+		<MainHeader :title="$t('user')" />
+		<MainContent>
+			<div class="container mx-auto flex max-w-5xl flex-col">
+				<div class="rounded-box border-base-content/10 bg-base-100 overflow-x-auto border">
+					<table class="d-table w-full">
+						<!-- head -->
+						<colgroup>
+							<col class="w-2/5" />
+							<col class="w-1/5" />
+							<col class="w-1/5" />
+						</colgroup>
+						<tbody>
+							<tr
+								v-for="user in users?.users"
+								:key="user.user_id"
+								class="border-base-content/10 border-b"
+							>
+								<td>
+									<div class="flex items-center gap-2">
+										<AvatarIcon :name="user.username" />
+										<div class="flex items-center gap-1">
+											<p>
+												{{ user.username }}
+											</p>
+											<div
+												class="d-badge d-badge-info bg-info/30 d-badge-xs border-0"
+												v-if="isSelf(user.user_id)"
+											>
+												{{ $t('you') }}
+											</div>
 										</div>
 									</div>
-								</div>
-							</td>
-							<td>
-								<RoleBadge :role="user.role" />
-							</td>
-							<td class="flex items-center justify-end">
-								<ConfirmDialog @confirm="handleDelete(user.user_id)" :title="$t('delete_user')">
-									<button
-										class="d-btn d-btn-ghost d-btn-xs hover:bg-error/20 active:bg-error/20 focus:outline-error hover:border-transparent focus:border-transparent focus:bg-transparent active:border-transparent"
-									>
-										<MaterialSymbolsDeleteOutlineRounded class="text-error size-4" />
-									</button>
-									<template #message>
-										<i18n-t
-											keypath="delete_user_message"
-											tag="p"
-											class="text-base-content/80 my-1 text-sm"
+								</td>
+								<td>
+									<RoleBadge :role="user.role" />
+								</td>
+								<td class="flex items-center justify-end">
+									<ConfirmDialog @confirm="handleDelete(user.user_id)" :title="$t('delete_user')">
+										<button
+											class="d-btn d-btn-ghost d-btn-xs hover:bg-error/20 active:bg-error/20 focus:outline-error hover:border-transparent focus:border-transparent focus:bg-transparent active:border-transparent"
 										>
-											<template #username>
-												<span class="font-bold italic text-black">{{ user.username }}</span>
-											</template>
-										</i18n-t>
-									</template>
-								</ConfirmDialog>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+											<MaterialSymbolsDeleteOutlineRounded class="text-error size-4" />
+										</button>
+										<template #message>
+											<i18n-t
+												keypath="delete_user_message"
+												tag="p"
+												class="text-base-content/80 my-1 text-sm"
+											>
+												<template #username>
+													<span class="font-bold italic text-black">{{ user.username }}</span>
+												</template>
+											</i18n-t>
+										</template>
+									</ConfirmDialog>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
+		</MainContent>
 	</MainLayout>
 </template>

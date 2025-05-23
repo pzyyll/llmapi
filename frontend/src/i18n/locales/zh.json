@@ -49,5 +49,9 @@
   "bad_gateway": "网络错误",
   "bad_gateway_desc": "抱歉，发生了网络错误。请稍后再试。",
   "refresh_page": "刷新页面",
-  "edit_key": "编辑密钥"
+  "edit_key": "编辑密钥",
+  "back": "返回",
+  "endpoint": "接入点",
+  "channel": "渠道",
+  "all_models": "所有模型"
 }

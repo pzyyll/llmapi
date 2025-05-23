@@ -9,6 +9,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     MaterialSymbolsAdd2Rounded: typeof import('~icons/material-symbols/add2-rounded')['default']
+    MaterialSymbolsArrowBack: typeof import('~icons/material-symbols/arrow-back')['default']
+    MaterialSymbolsArrowBackIosNewRounded: typeof import('~icons/material-symbols/arrow-back-ios-new-rounded')['default']
+    MaterialSymbolsArrowForwardIosRounded: typeof import('~icons/material-symbols/arrow-forward-ios-rounded')['default']
     MaterialSymbolsCheckRounded: typeof import('~icons/material-symbols/check-rounded')['default']
     MaterialSymbolsContentCopyOutlineRounded: typeof import('~icons/material-symbols/content-copy-outline-rounded')['default']
     MaterialSymbolsDeleteOutlineRounded: typeof import('~icons/material-symbols/delete-outline-rounded')['default']
