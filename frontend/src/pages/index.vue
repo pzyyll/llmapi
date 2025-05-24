@@ -115,7 +115,7 @@ const toggleSidebar = () => {
 		</template>
 
 		<div class="flex h-full flex-col pb-3 pr-3">
-			<NuxtPage />
+			<NuxtPage transition />
 		</div>
 	</NuxtLayout>
 </template>

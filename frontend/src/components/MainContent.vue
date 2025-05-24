@@ -1,5 +1,5 @@
 <template>
-	<div class="h-full overflow-auto">
+	<div class="h-full overflow-y-auto">
 		<div>
 			<slot name="header">
 				<!-- <div class="pt-4"></div> -->
